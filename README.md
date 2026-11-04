@@ -12,11 +12,18 @@ Bring [GraphiQL](https://github.com/graphql/graphiql) into [Orca](https://onorca
 
 Requires **Orca desktop 1.4.248 or newer**.
 
-1. Extract the bundled `graphiql-0.1.0.zip` into a permanent local folder.
-2. Open **Settings → Plugins → Development folders…** and add the extracted folder containing `orca-plugin.json`.
-3. Review and approve the requested access: a trusted networking worker, plugin-owned storage/secrets, and local workspace session-file access.
+1. Open **Settings → Plugins**.
+2. Choose **Add plugin → From a Git URL…** and enter:
 
-The bundled folder includes all editor assets, Monaco workers, fonts, and networking code. Installation requires no Node.js or development dependencies.
+   ```text
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.0
+   ```
+
+   Keep `#v0.1.0` at the end. Orca requires a release tag or commit hash to install from Git.
+3. Review and approve the requested access: a trusted networking worker, plugin-owned storage/secrets, and local workspace session-file access.
+4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
+
+The repository includes bundled editor assets, Monaco workers, fonts, and networking code. Installation requires no Node.js or development dependencies.
 
 ## Preview
 
@@ -104,6 +111,8 @@ Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large respon
 <summary>Local development and validation</summary>
 
 Requires Node.js 22+ and npm.
+
+To work on the plugin locally, clone this repository and add its root through **Settings → Plugins → Development folders…**.
 
 ```sh
 npm ci
