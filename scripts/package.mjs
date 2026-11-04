@@ -1,0 +1,36 @@
+import { createHash } from 'node:crypto';
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { deflateRawSync } from 'node:zlib';
+const manifest = JSON.parse(readFileSync('orca-plugin.json', 'utf8'));
+const release = 'graphiql-' + manifest.version;
+const folder = join('dist', release);
+rmSync(folder, { recursive: true, force: true }); mkdirSync(folder, { recursive: true });
+const roots = ['orca-plugin.json', 'editor', 'worker', 'activity', 'templates', 'images', 'README.md', 'COMPATIBILITY.md', 'THIRD_PARTY_NOTICES.txt', 'THIRD_PARTY_NOTICES.md', 'licenses', ...readdirSync('.').filter(name => /^LICENSE(?:-|$)/.test(name))];
+for (const root of roots) { if (!existsSync(root)) throw new Error('Missing distribution file: ' + root); cpSync(root, join(folder, root), { recursive: true }); }
+const files = [];
+function collect(dir, prefix = '') {
+  for (const name of readdirSync(dir).sort()) {
+    const path = join(dir, name); const stat = lstatSync(path); const relative = prefix + name;
+    if (stat.isSymbolicLink()) throw new Error('Symlink refused: ' + relative);
+    if (stat.isDirectory()) collect(path, relative + '/');
+    else files.push({ name: release + '/' + relative, data: readFileSync(path) });
+  }
+}
+collect(folder);
+const bytes = files.reduce((sum, file) => sum + file.data.length, 0);
+if (bytes > 50 * 1024 * 1024 || files.length > 2000 || files.some(file => /\.(m?js)$/.test(file.name) && file.data.length > 16 * 1024 * 1024)) throw new Error('Distribution exceeds Orca package limits');
+const crcTable = Array.from({ length: 256 }, (_, value) => { for (let bit = 0; bit < 8; bit++) value = value & 1 ? 0xedb88320 ^ value >>> 1 : value >>> 1; return value >>> 0; });
+const crc32 = data => { let crc = 0xffffffff; for (const byte of data) crc = crcTable[(crc ^ byte) & 255] ^ crc >>> 8; return (crc ^ 0xffffffff) >>> 0; };
+const local = [], central = []; let offset = 0;
+for (const file of files) {
+  const name = Buffer.from(file.name); const compressed = deflateRawSync(file.data, { level: 9 }); const crc = crc32(file.data);
+  const header = Buffer.alloc(30); header.writeUInt32LE(0x04034b50); header.writeUInt16LE(20, 4); header.writeUInt16LE(0x800, 6); header.writeUInt16LE(8, 8); header.writeUInt16LE(33, 12); header.writeUInt32LE(crc, 14); header.writeUInt32LE(compressed.length, 18); header.writeUInt32LE(file.data.length, 22); header.writeUInt16LE(name.length, 26);
+  const entry = Buffer.alloc(46); entry.writeUInt32LE(0x02014b50); entry.writeUInt16LE(20, 4); entry.writeUInt16LE(20, 6); entry.writeUInt16LE(0x800, 8); entry.writeUInt16LE(8, 10); entry.writeUInt16LE(33, 14); entry.writeUInt32LE(crc, 16); entry.writeUInt32LE(compressed.length, 20); entry.writeUInt32LE(file.data.length, 24); entry.writeUInt16LE(name.length, 28); entry.writeUInt32LE(offset, 42);
+  local.push(header, name, compressed); central.push(entry, name); offset += header.length + name.length + compressed.length;
+}
+const directory = Buffer.concat(central); const end = Buffer.alloc(22); end.writeUInt32LE(0x06054b50); end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10); end.writeUInt32LE(directory.length, 12); end.writeUInt32LE(offset, 16);
+const archive = Buffer.concat([...local, directory, end]); const filename = release + '.zip'; writeFileSync(join('dist', filename), archive);
+const digest = createHash('sha256').update(archive).digest('hex'); writeFileSync(join('dist', 'SHA256SUMS'), digest + '  ' + filename + '\n');
+const measurement = { version: manifest.version, files: files.length, unpackedBytes: bytes, archiveBytes: archive.length, largestScriptBytes: Math.max(...files.filter(file => /\.(m?js)$/.test(file.name)).map(file => file.data.length)), sha256: digest };
+writeFileSync(join('dist', 'artifact.json'), JSON.stringify(measurement, null, 2) + '\n'); console.log(JSON.stringify(measurement, null, 2));

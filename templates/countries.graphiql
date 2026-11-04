@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "name": "Countries",
+  "environments": [
+    {
+      "id": "countries",
+      "name": "Countries",
+      "endpoint": "https://countries.trevorblades.com/",
+      "headers": {},
+      "auth": {
+        "type": "none"
+      },
+      "production": false,
+      "timeoutMs": 20000
+    }
+  ],
+  "selectedEnvironment": "countries",
+  "operations": [
+    {
+      "id": "get-country",
+      "name": "GetCountry",
+      "query": "query GetCountry {\n  country(code: \"DE\") {\n    name\n    capital\n    currency\n    emoji\n    languages {\n      name\n    }\n  }\n}"
+    }
+  ],
+  "collections": [],
+  "preferences": {
+    "persistHistory": true
+  }
+}

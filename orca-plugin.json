@@ -1,0 +1,64 @@
+{
+  "manifestVersion": 2,
+  "id": "graphiql",
+  "name": "GraphiQL for Orca",
+  "version": "0.1.0",
+  "description": "A GraphiQL integration for Orca with saved sessions, named environments, schema exploration, and secure authentication.",
+  "engines": {
+    "orca": ">=1.4.248"
+  },
+  "execution": "trusted-worker",
+  "pluginApi": 1,
+  "contributes": {
+    "hooks": [{ "event": "editor.save.before" }],
+    "customEditors": [
+      {
+        "id": "graphiql",
+        "title": "GraphQL IDE",
+        "extensions": [
+          ".graphiql",
+          ".graphiql.json"
+        ],
+        "entry": "editor/index.html",
+        "frame": "isolated",
+        "icon": "images/icon.png"
+      }
+    ],
+    "newFiles": [
+      {
+        "id": "session",
+        "title": "New GraphiQL Session",
+        "extension": ".graphiql",
+        "template": "templates/empty.graphiql",
+        "icon": "images/icon.png"
+      }
+    ],
+    "panels": [
+      {
+        "id": "explorer",
+        "title": "GraphiQL Explorer",
+        "icon": "code",
+        "entry": "activity/index.html",
+        "ui": "html"
+      }
+    ]
+  },
+  "main": "worker/main.mjs",
+  "license": "MIT",
+  "capabilities": [
+    { "kind": "workspace:read" },
+    { "kind": "workspace:write" },
+    {
+      "kind": "storage:own"
+    },
+    {
+      "kind": "secrets:own"
+    }
+  ],
+  "author": {
+    "name": "faisalmuhammad",
+    "url": "https://github.com/faisalmuhammad"
+  },
+  "repository": "https://github.com/faisalmuhammad/orca-graphiql",
+  "icon": "images/icon.png"
+}

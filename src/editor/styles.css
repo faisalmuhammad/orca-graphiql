@@ -1,0 +1,38 @@
+html, body, #root, .orca-graphiql { height: 100%; margin: 0; }
+body { font: 13px system-ui, sans-serif; color: var(--orca-foreground); background: var(--orca-background); overflow: hidden; }
+.orca-graphiql { display: flex; flex-direction: column; }
+.session-toolbar { display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--orca-border); flex-wrap: wrap; }
+.session-toolbar strong { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.session-toolbar select { flex: 1; min-width: 120px; max-width: 280px; }
+:is(.session-toolbar, .orca-dialog, .orca-graphiql > .notice) :is(input, select, textarea, button) { box-sizing: border-box; font: inherit; border: 1px solid var(--orca-border); border-radius: 4px; padding: 6px 10px; color: inherit; background: var(--orca-card); }
+.orca-dialog :is(input, select, textarea) { width: 100%; }
+:is(.session-toolbar, .orca-dialog, .orca-graphiql > .notice) button { cursor: pointer; white-space: nowrap; }
+:is(.session-toolbar, .orca-dialog, .orca-graphiql > .notice) button:disabled { cursor: default; opacity: .55; }
+:is(.session-toolbar, .orca-dialog, .orca-graphiql > .notice) :focus-visible { outline: 2px solid var(--orca-ring); outline-offset: 2px; }
+.ide { flex: 1; min-height: 0; overflow: hidden; }
+.native-graphiql { height: 100%; }
+.connection-status { color: var(--orca-muted-foreground); margin-left: auto; font-size: 12px; }
+.orca-graphiql > .notice { padding: 8px 12px; display: flex; gap: 12px; align-items: center; background: var(--orca-muted); }
+.orca-graphiql > .notice span { flex: 1; }
+.orca-graphiql > .error, .orca-dialog [role=alert] { color: var(--orca-destructive); }
+.loading, .document-error { padding: 24px; }
+.orca-dialog { width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--orca-popover); color: var(--orca-popover-foreground); border: 1px solid var(--orca-border); border-radius: var(--orca-radius, 8px); padding: 20px; }
+.orca-dialog::backdrop { background: rgba(0,0,0,.5); }
+.orca-dialog .dialog-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.orca-dialog h2 { font-size: 16px; margin: 0; }
+.orca-dialog .fields { display: flex; flex-direction: column; gap: 12px; }
+.orca-dialog label { display: flex; flex-direction: column; gap: 6px; }
+.orca-dialog .check { display: flex; flex-direction: row; align-items: center; }
+.orca-dialog .check input { width: auto; }
+.orca-dialog textarea { font-family: ui-monospace, monospace; resize: vertical; }
+.orca-dialog .muted { color: var(--orca-muted-foreground); font-size: 12px; margin: 0; }
+.orca-dialog .dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.orca-dialog .primary { background: var(--orca-primary); color: var(--orca-primary-foreground); border-color: transparent; }
+.orca-dialog .danger { color: var(--orca-destructive); margin-right: auto; }
+/* Keep GraphiQL 6's native Variables/Headers controls in its resize bar. */
+.native-graphiql .graphiql-editor-tools { min-height: 40px; box-sizing: border-box; }
+.native-graphiql .graphiql-var-headers-strip { position: relative; }
+.native-graphiql .graphiql-var-headers-strip-bar { position: absolute; top: -40px; left: 0; right: 44px; height: 40px; z-index: 1; padding: 0 8px; }
+.native-graphiql .graphiql-editor-tool[style*="opacity: 0"] { position: relative !important; left: auto !important; opacity: 1 !important; flex: 0 0 0px !important; }
+.native-graphiql .graphiql-editor-tool[style*="opacity: 0"] .graphiql-var-headers-strip-content { display: none; }
+@media (max-width: 600px) { .session-toolbar strong { width: 100%; max-width: none; } .connection-status { margin-left: 0; } }

@@ -1,0 +1,51 @@
+{
+  "name": "orca-graphiql",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "vite build && node scripts/build-worker.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "fixture": "node tests/fixture.mjs",
+    "runtime:test": "node scripts/runtime-test.mjs",
+    "notices": "node scripts/notices.mjs",
+    "runtime:fixture": "node scripts/fixture-worker-test.mjs",
+    "validate": "orca plugin validate . --json",
+    "check": "orca plugin check . --json",
+    "test:orca": "orca plugin test . --json",
+    "images": "node scripts/images.mjs",
+    "screenshots": "node scripts/screenshots.mjs",
+    "package": "npm run build && npm run notices && node scripts/package.mjs"
+  },
+  "dependencies": {
+    "@graphiql/react": "1.0.1",
+    "@graphiql/toolkit": "1.0.0",
+    "graphiql": "6.0.0",
+    "graphql": "16.15.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "^4.3.6",
+    "@graphiql/plugin-collections": "1.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "esbuild": "^0.25.0",
+    "sharp": "^0.35.5",
+    "typescript": "^5.9.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.4"
+  },
+  "description": "A GraphiQL integration for Orca with saved sessions, named environments, schema exploration, and secure authentication.",
+  "author": {
+    "name": "faisalmuhammad",
+    "url": "https://github.com/faisalmuhammad"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/faisalmuhammad/orca-graphiql.git"
+  }
+}
