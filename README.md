@@ -20,7 +20,7 @@ Requires **Orca desktop 1.4.248 or newer**.
    ```
 
    Keep `#v0.1.0` at the end. Orca requires a release tag or commit hash to install from Git.
-3. Review and approve the requested access: a trusted networking worker, plugin-owned storage/secrets, and local workspace session-file access.
+3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
 The repository includes bundled editor assets, Monaco workers, fonts, and networking code. Installation requires no Node.js or development dependencies.
@@ -38,6 +38,8 @@ Editor previews are **actual Orca custom-editor captures**, presented with round
 3. Configure authentication if needed, then choose **Connect / Test**. Opening a file never connects or executes automatically. Remote HTTP requires explicit confirmation; localhost HTTP is allowed for development.
 4. Write an operation and choose GraphiQL's green Execute control. Use the native **Variables** and **Headers** tabs for inputs. Documentation, autocomplete, validation, formatting, and history come from GraphiQL.
 5. Save operations through GraphiQL **Collections** and persist the session with Orca's normal **Save**. Select another environment from the toolbar and connect it before executing.
+
+Collections save query text; variables and headers are excluded from collection items. Local query history can contain query text and variables when enabled.
 
 Use **Add environment…** in the environment selector to configure another endpoint.
 
@@ -68,7 +70,7 @@ Choose **Connect / Test**, then Execute. Expect **Germany**, **Berlin**, **EUR**
 | Official GraphiQL 6 | Native editors, schema browser, variables, headers, history, and Collections |
 | Named environments | Endpoint, auth reference, non-sensitive headers, timeout, and production designation |
 | Authentication | Bearer token, API key, or secret headers; secure storage or explicitly temporary credentials |
-| GraphiQL Explorer | Click to open/focus; New, Refresh, rename display name, and confirmed removal |
+| GraphiQL Explorer | Open saved session files; New, Refresh, rename display name, and confirmed removal |
 | Request controls | Cancellation, timeout, bounded concurrency, duplicate and stale-response protection |
 | Native documents | Save, read-only handling, external changes, and conflict/reload workflow |
 | Host integration | Light/dark theme, local Monaco workers, multiple tabs, and resizable layouts |
@@ -86,7 +88,7 @@ Explorer shows the environment, endpoint host, status, production/read-only desi
 
 ### Authentication and production
 
-The trusted worker resolves and adds credentials. Tokens and API keys never enter session files. Saved credentials are bound to the exact session, environment, and endpoint. If Orca cannot protect secrets, choose temporary credentials; there is no plaintext fallback. Native Headers are temporary and excluded from saved history and Collections. Persist only non-sensitive environment headers.
+The trusted worker resolves and adds credentials. Credentials entered through authentication settings are stored in Orca secrets or kept temporarily in memory; session files contain only saved credential references. Saved credentials are bound to the exact session, environment, and endpoint. If Orca cannot protect secrets, choose temporary credentials; there is no plaintext fallback. Native Headers are temporary and excluded from saved history and Collections. Keep secrets out of saved query text, variables, and non-sensitive environment headers.
 
 Mark an environment **Production** to require mutation confirmation. This identifies GraphQL mutations; queries can still have server-side effects. Redirects are refused, so configure the final endpoint URL.
 
@@ -102,8 +104,9 @@ Mark an environment **Production** to require mutation confirmation. This identi
 | Edit conflict | Reload the external version or resolve it in the source editor before saving. |
 | Oversized response | Reduce fields or paginate. Responses are rejected whole, never truncated. |
 | TLS/network error | Check endpoint, certificates, and connectivity. TLS validation remains enabled. |
+| Endpoint URL rejected | Use HTTP(S) without URL credentials, query parameters, or fragments. Configure authentication through Connection settings. |
 
-Limits: **256 KiB requests**, **768 KiB responses/documents**, **512 KiB private storage**, **50 history entries**, **8 concurrent worker requests**, **2 per editor**. Execution timeouts are configurable within the session schema's bounds.
+Limits: **256 KiB operation payloads**, **768 KiB responses/documents**, **512 KiB local editor state per session/environment/endpoint**, **50 history entries**, **8 concurrent worker requests**, **2 per editor**. Execution timeouts are configurable from **1–90 seconds**.
 
 Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large responses are follow-up work. Windows/Linux remain untested; see [validation and limitations](COMPATIBILITY.md). Orca accepts only built-in sidebar activity icons, so the rail uses `code`; the panel, editor, plugin, and new-file action use the official GraphQL logo.
 
@@ -113,6 +116,8 @@ Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large respon
 Requires Node.js 22+ and npm.
 
 To work on the plugin locally, clone this repository and add its root through **Settings → Plugins → Development folders…**.
+
+Release tags must include the compiled `editor/`, `worker/`, and `activity/` assets. Orca loads these directly without building the source. `node_modules/`, `.orca/`, and `dist/` are excluded from Git.
 
 ```sh
 npm ci
@@ -125,7 +130,7 @@ orca plugin check . --json
 orca plugin dev watch . --json
 ```
 
-Orca's test runner supplies its native document host; ordinary Vitest skips those tests. HTTP integration tests require permission to bind localhost.
+Orca's test runner supplies its native document host; ordinary Vitest skips those tests. HTTP integration tests start a localhost fixture server.
 
 With the development plugin loaded, `npm run runtime:test` exercises Countries through the actual worker; `npm run runtime:fixture` verifies authentication, redirects, disabled introspection, and production mutations using a local fixture. `npm run package` builds a runtime-only ZIP with size measurements and SHA-256 checksums under `dist/`.
 
