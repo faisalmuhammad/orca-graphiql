@@ -9,13 +9,14 @@ GraphiQL for Orca is an unofficial integration. The plugin's MIT license does no
 | React, React DOM, compiler runtime | [facebook/react](https://github.com/facebook/react) | MIT, complete notices in TXT |
 | Monaco and language tooling | [microsoft/monaco-editor](https://github.com/microsoft/monaco-editor) | MIT and upstream ThirdPartyNotices, [LICENSE-MONACO](LICENSE-MONACO) |
 | GraphQL logo | Official GraphiQL package assets, converted to PNG | Asset distributed with MIT GraphiQL; no endorsement implied |
-| Fira Code | Fonts bundled by GraphiQL; [tonsky/FiraCode](https://github.com/tonsky/FiraCode) | SIL OFL 1.1, [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
-| Roboto | Fonts bundled by GraphiQL; Google/Christian Robertson | Apache 2.0, [LICENSE-ROBOTO](LICENSE-ROBOTO), [terms](LICENSE-APACHE-2.0) |
+| Fira Code | Used in original screenshots; runtime uses system fonts; [tonsky/FiraCode](https://github.com/tonsky/FiraCode) | SIL OFL 1.1, [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
+| Roboto | Used in original screenshots; runtime uses system fonts; Google/Christian Robertson | Apache 2.0, [LICENSE-ROBOTO](LICENSE-ROBOTO), [terms](LICENSE-APACHE-2.0) |
 | Zod and transitive runtime libraries | Official lockfile-resolved npm packages | Original notices in TXT |
-| TypeScript, Vite, Vitest, esbuild, Sharp, development typings | Official npm build/test/image tools; excluded as runtime dependencies from ZIP | Original direct-tool notices in TXT |
+| TypeScript, Vite, Vitest, esbuild, PostCSS, Sharp, wawoff2, development typings | Official npm build/test/image/font tools; excluded as runtime dependencies from ZIP | Original direct-tool notices in TXT |
 | Countries example | [Trevor Blades](https://github.com/trevorblades/countries), countries.trevorblades.com | External service; server source not bundled |
+| Browser validation | [Playwright](https://github.com/microsoft/playwright) with local Google Chrome; temporary test tooling, not bundled | Playwright Apache 2.0; browser not redistributed |
 
-`scripts/notices.mjs` records installed runtime dependencies, peer/optional packages, direct development tools, and embedded fonts. It can conservatively include installed optional packages not emitted into the bundle.
+`scripts/notices.mjs` records installed runtime dependencies, peer/optional packages, direct development tools, and original screenshot font notices. It can conservatively include installed optional packages not emitted into the bundle.
 
 Two npm packages omit license text. `licenses/react-remove-scroll-bar.txt` supplies its upstream MIT notice; `licenses/react-compiler-runtime.txt` supplies the React root MIT notice inherited by that package. Both enter the generated collection.
 

@@ -1,16 +1,17 @@
 import { createHash } from 'node:crypto';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { deflateRawSync } from 'node:zlib';
 const manifest = JSON.parse(readFileSync('orca-plugin.json', 'utf8'));
 const release = 'graphiql-' + manifest.version;
 const folder = join('dist', release);
 rmSync(folder, { recursive: true, force: true }); mkdirSync(folder, { recursive: true });
-const roots = ['orca-plugin.json', 'editor', 'worker', 'activity', 'templates', 'images', 'README.md', 'COMPATIBILITY.md', 'THIRD_PARTY_NOTICES.txt', 'THIRD_PARTY_NOTICES.md', 'licenses', ...readdirSync('.').filter(name => /^LICENSE(?:-|$)/.test(name))];
-for (const root of roots) { if (!existsSync(root)) throw new Error('Missing distribution file: ' + root); cpSync(root, join(folder, root), { recursive: true }); }
+const roots = ['orca-plugin.json', 'editor', 'worker', 'activity', 'templates', 'images', 'README.md', 'COMPATIBILITY.md', 'BUNDLE_SIZE.md', 'THIRD_PARTY_NOTICES.txt', 'THIRD_PARTY_NOTICES.md', 'licenses', ...readdirSync('.').filter(name => /^LICENSE(?:-|$)/.test(name))];
+for (const root of roots) { if (!existsSync(root)) throw new Error('Missing distribution file: ' + root); cpSync(root, join(folder, root), { recursive: true, filter: path => !['.DS_Store', 'Thumbs.db'].includes(basename(path)) }); }
 const files = [];
 function collect(dir, prefix = '') {
   for (const name of readdirSync(dir).sort()) {
+    if (['.DS_Store', 'Thumbs.db'].includes(name)) continue;
     const path = join(dir, name); const stat = lstatSync(path); const relative = prefix + name;
     if (stat.isSymbolicLink()) throw new Error('Symlink refused: ' + relative);
     if (stat.isDirectory()) collect(path, relative + '/');

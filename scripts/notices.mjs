@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 const root = JSON.parse(readFileSync('package.json', 'utf8'));
 const seen = new Set();
-const notices = ['Third-party notices for GraphiQL for Orca', 'Runtime dependencies, embedded font assets, and development tools. Original notices follow.'];
+const notices = ['Third-party notices for GraphiQL for Orca', 'Runtime dependencies, embedded Codicon font, and development tools. Fira Code and Roboto notices are retained for original screenshots; these text fonts are not bundled in the runtime CSS. Original notices follow.'];
 function packageDirectory(name, from) {
   let base = resolve(from);
   for (;;) {
@@ -33,4 +33,4 @@ for (const name of Object.keys(root.dependencies)) visit(name);
 for (const name of Object.keys(root.devDependencies)) { const dir = packageDirectory(name, '.'); if (dir) record(dir, 'development tool; not shipped as runtime code'); }
 for (const [name, file] of [['Fira Code font', 'LICENSE-FIRA-CODE'], ['Roboto font', 'LICENSE-ROBOTO']]) { notices.push(`\n${name} — ${file}\n`, readFileSync(file, 'utf8')); }
 writeFileSync('THIRD_PARTY_NOTICES.txt', notices.join('\n'));
-console.log(`Recorded ${seen.size} installed packages plus embedded font notices`);
+console.log(`Recorded ${seen.size} installed packages plus original screenshot font notices`);

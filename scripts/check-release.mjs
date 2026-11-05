@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { lstatSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ignored = new Set(['.git', '.orca', 'node_modules', 'dist']);
+const ignored = new Set(['.git', '.orca', 'node_modules', 'dist', '.DS_Store', 'Thumbs.db']);
 const files = new Set();
 const issues = [];
 function collect(folder = '.') {

@@ -16,14 +16,14 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.1
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.2
    ```
 
-   Keep `#v0.1.1` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.2` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
-The repository includes bundled editor assets, Monaco workers, fonts, and networking code. Installation requires no Node.js or development dependencies.
+The repository includes bundled editor assets, Monaco workers, the icon font, and networking code. Text uses system fonts. Installation requires no Node.js or development dependencies.
 
 ## Preview
 
@@ -119,13 +119,14 @@ To work on the plugin locally, clone this repository and add its root through **
 
 Release tags must include the compiled `editor/`, `worker/`, and `activity/` assets. Orca loads these directly without building the source. `node_modules/`, `.orca/`, and `dist/` are excluded from Git.
 
-Fonts are embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks in the source tree and tracked files. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed.
+UI and editor text use system fonts. The complete Monaco icon font is compressed to WOFF2 and embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks in the source tree and tracked files. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed.
 
 ```sh
 npm ci
 npm run build
 npm run typecheck
 npm test
+npm run test:bundle
 orca plugin test . --json
 orca plugin validate . --json
 orca plugin check . --json
@@ -136,7 +137,7 @@ Orca's test runner supplies its native document host; ordinary Vitest skips thos
 
 With the development plugin loaded, `npm run runtime:test` exercises Countries through the actual worker; `npm run runtime:fixture` verifies authentication, redirects, disabled introspection, and production mutations using a local fixture. `npm run package` builds a runtime-only ZIP with size measurements and SHA-256 checksums under `dist/`.
 
-Public host API contracts are defined in `src/shared/orca-api.ts`.
+Public host API contracts are defined in `src/shared/orca-api.ts`. Production builds minify the worker/sidebar, remove bundled text fonts and duplicate CSS, compress the complete icon font to inline WOFF2, preserve upstream lazy imports, and compress images losslessly. `npm run test:bundle` runs the worker fixture tests against the compiled worker. See [bundle size measurements](BUNDLE_SIZE.md).
 
 Original screenshots are preserved in `assets/captures/`. `npm run screenshots` rebuilds their gradient framing without resizing the captured interface. `npm run images` rebuilds the active cover. Original captures are excluded from the runtime ZIP.
 
@@ -152,7 +153,7 @@ An unofficial integration of [GraphiQL](https://github.com/graphql/graphiql), ma
 | GraphQL.js | MIT | [LICENSE-GRAPHQL](LICENSE-GRAPHQL) |
 | React and React DOM | MIT | [Third-party notices](THIRD_PARTY_NOTICES.txt) |
 | Monaco Editor | MIT and upstream third-party notices | [LICENSE-MONACO](LICENSE-MONACO) |
-| Fira Code | SIL OFL 1.1 | [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
-| Roboto | Apache 2.0 | [LICENSE-ROBOTO](LICENSE-ROBOTO) |
+| Fira Code (original screenshots) | SIL OFL 1.1 | [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
+| Roboto (original screenshots) | Apache 2.0 | [LICENSE-ROBOTO](LICENSE-ROBOTO) |
 
 Plugin code uses [MIT](LICENSE). See [credits/provenance](THIRD_PARTY_NOTICES.md) and [complete license texts](THIRD_PARTY_NOTICES.txt), including development tools.
