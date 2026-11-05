@@ -117,7 +117,7 @@ Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large respon
 <details>
 <summary>Local development and validation</summary>
 
-The plugin root contains Orca's manifest, compiled runtime assets, templates, and previews. Source, dependencies, tests, build scripts, and original captures live under `build/`. This follows the layout of Orca's [Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw).
+The plugin root contains Orca's manifest, compiled runtime assets, templates, and previews. Source, dependencies, tests, build scripts, and original captures live under `build/`.
 
 Requires Node.js 22+ and npm. From the repository root:
 

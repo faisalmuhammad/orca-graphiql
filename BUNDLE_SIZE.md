@@ -68,14 +68,14 @@ The official GraphiQL React application is unchanged. Schema autocomplete, unkno
 Orca's documented limits apply to the entire plugin folder (2,000 files / 50 MiB), an actual panel/editor entry (10 MiB), and each file Orca transpiles (1 MiB). The HTML editor entry remains 343 bytes. The public manual-review `code` and `size` thresholds are not disclosed; this optimization does not guarantee that review will clear. This build has browser and native-host test evidence, but its newly shared workers have not been exercised in an actual Orca editor tab. Existing Orca GUI evidence is from earlier builds.
 
 
-## Excalidraw build patterns: 0.1.5
+## Build organization and dependency inventory: 0.1.5
 
-The [official Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw) puts source and tooling under `build/` and commits the generated root `editor/`. GraphiQL now follows that layout for its source, tests, scripts, locked dependencies, fallback license texts, and original captures. Runtime editor, worker, sidebar, previews, and templates remain at the root. Moving files does not itself reduce their size.
+GraphiQL keeps its source, tests, scripts, locked dependencies, fallback license texts, and original captures under `build/`. The generated editor, worker, sidebar, previews, and templates remain at the plugin root. Moving files does not itself reduce their size.
 
 The build collects packages contributing emitted JavaScript/CSS, rather than traversing every installed dependency and optional peer. Complete runtime license/notice documents remain verbatim; direct development tools retain credits and primary licenses, and screenshot font notices remain. This reduces the notice collection from 713,488 to 660,418 bytes (53,070 bytes). The inventory contains 84 bundled packages and 10 direct tools. Original legal documents are deduplicated only when byte-identical.
 
 All generated editor, HTTP worker, sidebar, and preview assets are byte-identical to 0.1.4. The editor remains 6,804,800 bytes with a largest chunk of 820,061 bytes. Autocomplete, validation, formatting, and every existing plugin feature are retained. Tests and packaging run from `build/`; exact final source-folder and runtime-package measurements are reported by the release checker and `dist/artifact.json`.
 
-The official Excalidraw reference currently has 8,844,258 bytes of editor assets and a largest JS chunk of 1,820,887 bytes. Its layout is useful for clarity and provenance; it does not demonstrate that GraphiQL violates a public size limit. We retain Vite for GraphiQL's supported worker integration and TypeScript for source checks. Excalidraw's omitted CJK fonts, WASM rewrites, and sandboxed-only execution cannot be applied directly to GraphiQL. We do not vendor Orca's test implementation or generate duplicate fallback editors.
+Vite provides GraphiQL's supported worker integration, and TypeScript provides source checks. The build generates a single editor for Orca's isolated frame, with locally bundled module workers and assets.
 
 Generated assets are marked with GitHub Linguist attributes, and Monaco adaptations fail the build if required patterns disappear. Dependencies, generated provenance, local host metadata, and ZIPs remain excluded from uploads. Existing screenshots and their original captures are preserved. Neither layout changes nor the measured notice saving guarantee clearance of the unpublished catalog `code`/`size` review categories.

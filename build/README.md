@@ -1,6 +1,6 @@
 # Building GraphiQL for Orca
 
-The repository root is the installable Orca plugin. `build/` contains its source, locked dependencies, tests, and build tooling, following the official [Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw/build). Keep `editor/`, `worker/`, and `activity/` at the plugin root: Orca loads their compiled JavaScript directly.
+The repository root is the installable Orca plugin. `build/` contains its source, locked dependencies, tests, and build tooling. Keep `editor/`, `worker/`, and `activity/` at the plugin root: Orca loads their compiled JavaScript directly.
 
 Requires Node.js 22+ and npm. From this directory:
 
@@ -40,8 +40,6 @@ UI/editor text uses system fonts. The complete Codicon font is compressed to inl
 ## Notices and credits
 
 Vite/Rollup and esbuild record packages contributing emitted code or styles. `npm run notices` requires those inventories, so run `npm run build` first. Complete original runtime license/notice documents remain verbatim, with byte-identical documents shared through a package index. Direct development tools retain credits and their primary license texts; their executables and transitive dependencies are installed by npm rather than distributed with the plugin. Screenshot font notices remain included. See [credits and provenance](../THIRD_PARTY_NOTICES.md).
-
-Build layout and dependency-based notice generation follow Excalidraw's MIT-licensed build patterns. Excalidraw itself and its source code are not bundled. Its font/WASM patches and sandboxed execution profile do not apply to GraphiQL's trusted HTTP worker.
 
 ## Runtime checks and packaging
 

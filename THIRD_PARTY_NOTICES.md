@@ -24,4 +24,3 @@ Two npm packages omit license text. `build/licenses/react-remove-scroll-bar.txt`
 
 Orca is the host application. This repository includes neither its runtime nor upstream API declarations and supplies no Orca license file. The minimal interfaces in `build/src/shared/orca-api.ts` are original plugin code.
 
-Build organization and dependency-based notice generation follow patterns in Orca's [official Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw/build), licensed MIT. This plugin does not bundle Excalidraw or its source.
