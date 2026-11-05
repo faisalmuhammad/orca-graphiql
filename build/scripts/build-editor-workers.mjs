@@ -1,11 +1,12 @@
 import { build } from 'esbuild';
 import { readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
+import { emittedInputs, recordInputs } from './provenance.mjs';
 
 // Build all three module workers together so their common Monaco/GraphQL
 // infrastructure is emitted once. The official GraphiQL worker constructors
 // still load local module URLs and retain their original labels and lifecycle.
-const folder = 'editor/assets';
+const folder = '../editor/assets';
 const entries = {
   'editor.worker': 'node_modules/monaco-editor/esm/vs/editor/editor.worker.js',
   'json.worker': 'node_modules/monaco-editor/esm/vs/languages/features/json/json.worker.js',
@@ -22,7 +23,9 @@ const result = await build({
   mainFields: ['browser', 'module', 'main'],
   entryNames: '[name]-[hash]', chunkNames: 'worker-shared-[hash]',
   metafile: true, write: false,
+  legalComments: 'none',
 });
+recordInputs('editor-workers', emittedInputs(result.metafile));
 const replacements = new Map();
 for (const [name, entry] of Object.entries(entries)) {
   const output = Object.entries(result.metafile.outputs).find(([, metadata]) => metadata.entryPoint === entry);
@@ -31,7 +34,7 @@ for (const [name, entry] of Object.entries(entries)) {
 }
 for (const file of result.outputFiles) writeFileSync(file.path, file.contents);
 const references = new Map([...replacements.keys()].map(name => [name, 0]));
-const files = ['editor/index.html', ...readdirSync(folder).filter(file => file.endsWith('.js')).map(file => join(folder, file))];
+const files = ['../editor/index.html', ...readdirSync(folder).filter(file => file.endsWith('.js')).map(file => join(folder, file))];
 for (const path of files) {
   const before = readFileSync(path, 'utf8');
   let after = before;

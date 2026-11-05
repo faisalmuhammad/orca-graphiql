@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 import type { OrcaWorkerApi, PanelRequestContext } from '../../src/shared/orca-api';
 import activate from '../../src/worker/main';
 const activateWorker: typeof activate = process.env.GRAPHIQL_TEST_COMPILED_WORKER === '1'
-  ? (await import(new URL('../../worker/main.mjs', import.meta.url).href)).default
+  ? (await import(new URL('../../../worker/main.mjs', import.meta.url).href)).default
   : activate;
 export function mockWorker(secure = true) {
   const handlers = new Map<string, (input: any, context: PanelRequestContext) => any>();

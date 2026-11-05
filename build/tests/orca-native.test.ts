@@ -8,11 +8,11 @@ const testModule = 'orca/testing';
 const kit = await import(/* @vite-ignore */ testModule).catch(() => null);
 let host: any;
 let controller: Awaited<ReturnType<typeof openSession>> | undefined;
-const empty = readFileSync('templates/empty.graphiql', 'utf8');
+const empty = readFileSync('../templates/empty.graphiql', 'utf8');
 afterEach(() => { controller?.dispose(); controller = undefined; host?.dispose(); });
 describe.skipIf(!kit)('native Orca document session', () => {
   it('assigns independent persistent identities to copied Countries examples', async () => {
-    const countries = readFileSync('templates/countries.graphiql', 'utf8');
+    const countries = readFileSync('../templates/countries.graphiql', 'utf8');
     host = kit.mockEditorHost({ text: countries });
     controller = await openSession(host.orca);
     await host.flush();

@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import { fileURLToPath } from 'node:url';
+import { recordInputs } from './scripts/provenance.mjs';
 const monacoFeatures = fileURLToPath(new URL('./src/editor/monaco-features.ts', import.meta.url));
 const optionalMonacoFeatures = /\/(?:anchorSelect|codelens|colorPicker|diffEditorBreadcrumbs|floatingMenu|gpu|inlayHints|inlineProgress|inPlaceReplace|linkedEditing|longLinesHelper|middleScroll|sectionHeaders|semanticTokens|stickyScroll|iPadShowKeyboard|inspectTokens)\/|\/(?:diffEditor[.]contribution|inlineCompletions[.]contribution|dropIntoEditorContribution)[.]js$/;
 function compactMonacoRegistrations(): Plugin {
@@ -10,13 +11,22 @@ function compactMonacoRegistrations(): Plugin {
       // effect. Use the same selected registrations as the public aggregate.
       // Its worker creation, model synchronization, and Trusted Types stay intact.
       if (!id.replaceAll('\\', '/').endsWith('/monaco-editor/esm/vs/internal/common/workers.js')) return;
-      if (!code.includes('export { createWebWorker }') || !code.includes('createTrustedTypesPolicy')) {
+      if (!code.includes('export { createWebWorker }') || !code.includes('createTrustedTypesPolicy') || !code.includes('suggestController.js')) {
         throw new Error('Monaco worker helper changed; review feature selection before upgrading.');
+      }
+      const removed: string[] = [];
+      const compact = code.replace(/^import ['"]([^'"]+)['"];?\r?\n/gm, (statement, path: string) => {
+        if (!optionalMonacoFeatures.test(path)) return statement;
+        removed.push(path);
+        return '';
+      });
+      for (const feature of ['codelensController.js', 'colorPickerContribution.js', 'diffEditor.contribution.js']) {
+        if (!removed.some(path => path.endsWith('/' + feature))) throw new Error('Expected Monaco adaptation no longer applies: ' + feature);
       }
       return {
         // Retain the helper's core controllers (notably suggestions, paste,
         // and keyboard commands); public feature registrations alone omit them.
-        code: code.replace(/^import ['"]([^'"]+)['"];?\r?\n/gm, (statement, path: string) => optionalMonacoFeatures.test(path) ? '' : statement),
+        code: compact,
         map: null,
       };
     },
@@ -24,7 +34,17 @@ function compactMonacoRegistrations(): Plugin {
 }
 export default defineConfig({
   root: 'src/editor', base: './',
-  plugins: [compactMonacoRegistrations()],
+  plugins: [compactMonacoRegistrations(), {
+    name: 'graphiql-bundle-provenance',
+    generateBundle(_options, bundle) {
+      const inputs = Object.values(bundle).flatMap(output => output.type === 'chunk'
+        ? Object.entries(output.modules).filter(([, module]) => module.renderedLength > 0).map(([id]) => id) : []);
+      // CSS is emitted separately and can have zero rendered JS bytes.
+      inputs.push(...[...this.getModuleIds()].filter(id => /[.]css(?:[?]|$)/.test(id)));
+      recordInputs('editor', inputs);
+    },
+  }],
+  esbuild: { legalComments: 'none' },
   resolve: {
     alias: [{
       find: /^monaco-editor\/features\/register[.]all(?:[.]js)?$/,
@@ -32,7 +52,7 @@ export default defineConfig({
     }],
   },
   build: {
-    outDir: '../../editor', emptyOutDir: true, target: 'es2022',
+    outDir: '../../../editor', emptyOutDir: true, target: 'es2022',
     chunkSizeWarningLimit: 1000, cssCodeSplit: false, modulePreload: false,
     // Orca's public indexer disallows standalone binary fonts. Keep them local in CSS.
     assetsInlineLimit: filePath => /[.](ttf|otf|woff2?|eot)$/i.test(filePath) ? true : undefined,

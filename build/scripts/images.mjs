@@ -1,3 +1,5 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import sharp from 'sharp';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -50,7 +52,7 @@ const artwork = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${wi
   <rect x="${editor.x - 1}" y="${editor.y - 1}" width="${editor.width + 2}" height="${editor.height + 2}" rx="14" fill="#26202e" stroke="#a1427d" stroke-opacity=".7" filter="url(#shadow)"/>
 </svg>`);
 // Preserve the complete real editor, including its connection bar and native tabs.
-const capture = await sharp('assets/captures/cover-editor.png')
+const capture = await sharp('build/assets/captures/cover-editor.png')
   .resize(editor.width, editor.height - editor.chrome).png().toBuffer();
 const chrome = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${editor.width}" height="${editor.height}"><rect width="100%" height="100%" fill="#151b25"/><path d="M0 29.5H${editor.width}" stroke="#303442"/><circle cx="20" cy="15" r="4.5" fill="#ff5f57"/><circle cx="36" cy="15" r="4.5" fill="#febc2e"/><circle cx="52" cy="15" r="4.5" fill="#28c840"/><text x="78" y="19" fill="#91a0b2" font-family="Arial, sans-serif" font-size="12">countries.graphiql</text></svg>`);
 const framed = await sharp(chrome).composite([{ input: capture, left: 0, top: editor.chrome }]).png().toBuffer();

@@ -1,11 +1,11 @@
 {
-  "name": "orca-graphiql",
-  "version": "0.1.4",
+  "name": "orca-graphiql-build",
+  "version": "0.1.5",
   "private": true,
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "vite build && node scripts/build-editor-workers.mjs && node scripts/build-worker.mjs && node scripts/optimize-assets.mjs",
+    "build": "node build.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:bundle": "node scripts/test-bundle.mjs",
@@ -13,13 +13,13 @@
     "runtime:test": "node scripts/runtime-test.mjs",
     "notices": "node scripts/notices.mjs",
     "runtime:fixture": "node scripts/fixture-worker-test.mjs",
-    "validate": "orca plugin validate . --json",
-    "check": "orca plugin check . --json",
+    "validate": "orca plugin validate .. --json",
+    "check": "orca plugin check .. --json",
     "test:orca": "orca plugin test . --json",
     "images": "node scripts/images.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "release:check": "node scripts/check-release.mjs",
-    "package": "npm run build && npm run notices && npm run release:check && node scripts/package.mjs"
+    "package": "npm run build && npm run release:check && node scripts/package.mjs"
   },
   "dependencies": {
     "@graphiql/plugin-collections": "1.0.1",

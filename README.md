@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.4
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.5
    ```
 
-   Keep `#v0.1.4` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.5` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -117,33 +117,26 @@ Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large respon
 <details>
 <summary>Local development and validation</summary>
 
-Requires Node.js 22+ and npm.
+The plugin root contains Orca's manifest, compiled runtime assets, templates, and previews. Source, dependencies, tests, build scripts, and original captures live under `build/`. This follows the layout of Orca's [Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw).
 
-To work on the plugin locally, clone this repository and add its root through **Settings → Plugins → Development folders…**.
-
-Release tags must include the compiled `editor/`, `worker/`, and `activity/` assets. Orca loads these directly without building the source. `node_modules/`, `.orca/`, and `dist/` are excluded from Git.
-
-UI and editor text use system fonts. The complete Monaco icon font is compressed to WOFF2 and embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks, checks Orca's documented source-folder and entry limits, and enforces a stricter project budget of 1 MiB per editor JavaScript chunk. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed, then stage additions and removals with `git add .` before checking tracked files.
+Requires Node.js 22+ and npm. From the repository root:
 
 ```sh
-npm ci
-npm run build
-npm run typecheck
-npm test
-npm run test:bundle
-orca plugin test . --json
+npm --prefix build ci
+npm --prefix build run build
+npm --prefix build run typecheck
+npm --prefix build test
+npm --prefix build run test:bundle
+orca plugin test build --json
 orca plugin validate . --json
 orca plugin check . --json
-orca plugin dev watch . --json
 ```
 
-Orca's test runner supplies its native document host; ordinary Vitest skips those tests. HTTP integration tests start a localhost fixture server.
+Add the repository root through **Settings → Plugins → Development folders…**. Release tags must include compiled `editor/`, `worker/`, and `activity/`; Orca loads them directly. Exclude `node_modules/`, `.orca/`, `build/.cache/`, and `dist/` from uploads and Git.
 
-With the development plugin loaded, `npm run runtime:test` exercises Countries through the actual worker; `npm run runtime:fixture` verifies authentication, redirects, disabled introspection, and production mutations using a local fixture. `npm run package` builds a runtime-only ZIP with size measurements and SHA-256 checksums under `dist/`.
+When uploading this restructure manually, upload `build/` without its dependencies/cache and remove the previous root source/tooling paths. The compiled runtime assets and images match v0.1.4, so those folders can stay as they are. For later builds that change editor assets, replace the entire `editor/` folder to remove obsolete hashes. Stage additions and removals with `git add .`, then run `npm --prefix build run release:check` before tagging.
 
-Public host API contracts are defined in `src/shared/orca-api.ts`. Production builds minify the worker/sidebar, remove bundled text fonts and duplicate CSS, compress the complete icon font to inline WOFF2, preserve upstream lazy imports, and compress images losslessly. Release 0.1.4 selects Monaco's editing features, splits vendor code into smaller local chunks, and shares infrastructure between the three local module workers. Schema autocomplete, validation, documentation, formatting, find, and keyboard editing remain available; optional Monaco extras such as CodeLens, color pickers, inlay hints, and sticky scroll are omitted. Splitting improves file granularity; feature selection and shared workers reduce total bytes. `npm run test:bundle` runs the worker fixture tests against the compiled worker. See [bundle size measurements](BUNDLE_SIZE.md).
-
-Original screenshots are preserved in `assets/captures/`. `npm run screenshots` rebuilds their gradient framing without resizing the captured interface; append `-- activity-panel.png` to rebuild only that preview. The Explorer preview crops Orca's path/chat chrome and unused space, and combines the native editor and panel captures. `npm run images` rebuilds the active cover. Original captures are excluded from the runtime ZIP.
+See [build instructions, compatibility adaptations, and test commands](build/README.md) and [bundle measurements](BUNDLE_SIZE.md).
 
 </details>
 

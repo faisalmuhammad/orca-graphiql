@@ -1,1 +1,6 @@
 * -text
+# Generated runtime assets; readable source and build recipe live in build/.
+editor/** linguist-generated=true -diff
+worker/** linguist-generated=true -diff
+activity/** linguist-generated=true -diff
+THIRD_PARTY_NOTICES.txt linguist-generated=true

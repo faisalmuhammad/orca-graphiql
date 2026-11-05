@@ -2,7 +2,7 @@
 
 Explorer layout inspiration: [Rich Presence for Discord](https://www.onorca.dev/plugins/jondmarien/orca-discord-presence) by [jondmarien](https://github.com/jondmarien). The Explorer implementation uses the plugin's original code and GraphQL assets.
 
-GraphiQL for Orca is an unofficial integration. The plugin's MIT license does not replace upstream licenses. [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) preserves installed dependency license texts and Monaco's upstream third-party notices. Versions are recorded in `package-lock.json`.
+GraphiQL for Orca is an unofficial integration. The plugin's MIT license does not replace upstream licenses. [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) preserves bundled dependency license texts and Monaco's upstream third-party notices. Versions are recorded in `build/package-lock.json`.
 
 | Component | Provenance | License / notice |
 | --- | --- | --- |
@@ -18,8 +18,10 @@ GraphiQL for Orca is an unofficial integration. The plugin's MIT license does no
 | Countries example | [Trevor Blades](https://github.com/trevorblades/countries), countries.trevorblades.com | External service; server source not bundled |
 | Browser validation | [Playwright](https://github.com/microsoft/playwright) with local Google Chrome; temporary test tooling, not bundled | Playwright Apache 2.0; browser not redistributed |
 
-`scripts/notices.mjs` records installed runtime dependencies, peer/optional packages, direct development tools, and original screenshot font notices. It can conservatively include installed optional packages not emitted into the bundle. The generated TXT starts with a package index linking every credited package to its `NOTICE-…` documents. Only byte-identical documents share a reference; each distinct original copyright, license, and notice text is included verbatim. This avoids repeated legal text without removing attribution or license terms.
+`build/scripts/notices.mjs` records packages contributing emitted editor, worker, or sidebar code/styles, using Vite/Rollup and esbuild provenance. It includes each bundled package's complete original license/notice documents, direct development-tool credits and primary license texts, and original screenshot font notices. Unbundled optional dependencies are omitted; development-tool executables and transitive dependencies are installed by npm rather than shipped with the plugin. The TXT starts with a package index linking every credited package to its `NOTICE-…` documents. Only byte-identical documents share a reference; distinct original legal text is preserved verbatim.
 
-Two npm packages omit license text. `licenses/react-remove-scroll-bar.txt` supplies its upstream MIT notice; `licenses/react-compiler-runtime.txt` supplies the React root MIT notice inherited by that package. Both enter the generated collection.
+Two npm packages omit license text. `build/licenses/react-remove-scroll-bar.txt` supplies its upstream MIT notice; `build/licenses/react-compiler-runtime.txt` supplies the React root MIT notice inherited by that package. Both enter the generated collection.
 
-Orca is the host application. This repository includes neither its runtime nor upstream API declarations and supplies no Orca license file. The minimal interfaces in `src/shared/orca-api.ts` are original plugin code.
+Orca is the host application. This repository includes neither its runtime nor upstream API declarations and supplies no Orca license file. The minimal interfaces in `build/src/shared/orca-api.ts` are original plugin code.
+
+Build organization and dependency-based notice generation follow patterns in Orca's [official Excalidraw plugin](https://github.com/stablyai/orca-plugins/tree/main/plugins/excalidraw/build), licensed MIT. This plugin does not bundle Excalidraw or its source.

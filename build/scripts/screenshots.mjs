@@ -1,9 +1,11 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import sharp from 'sharp';
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 // Archive original captures once. Rebuild from them to avoid repeated framing.
-const originals = 'assets/captures';
+const originals = 'build/assets/captures';
 mkdirSync(originals, { recursive: true });
 const requested = process.argv.slice(2);
 if (requested.some(name => !/^[a-z0-9-]+[.]png$/i.test(name) || name === 'icon.png' || /^cover[0-9]*[.]png$/.test(name))) {

@@ -1,3 +1,5 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import GraphQLLogo from '../node_modules/@graphiql/react/dist/icons/graphql-logo.svg_react.js';

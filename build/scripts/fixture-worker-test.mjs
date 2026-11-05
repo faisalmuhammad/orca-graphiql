@@ -1,3 +1,5 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import { randomUUID } from 'node:crypto';
 import { getIntrospectionQuery } from 'graphql';
 import { createFixture } from '../tests/fixture.mjs';

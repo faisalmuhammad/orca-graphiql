@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parseSession, serializeSession, environmentSchema } from '../src/shared/session-schema';
 import { mergeSessions } from '../src/persistence/merge';
-const empty = () => parseSession(readFileSync('templates/empty.graphiql', 'utf8'));
+const empty = () => parseSession(readFileSync('../templates/empty.graphiql', 'utf8'));
 describe('session persistence', () => {
   it('keeps a valid empty default and a separate Countries example', () => {
     expect(empty().environments).toEqual([]); expect(empty().operations).toEqual([]);
-    const example = parseSession(readFileSync('templates/countries.graphiql', 'utf8'));
+    const example = parseSession(readFileSync('../templates/countries.graphiql', 'utf8'));
     expect(example.environments[0].endpoint).toBe('https://countries.trevorblades.com/');
     expect(parseSession(serializeSession(example))).toEqual(example);
   });

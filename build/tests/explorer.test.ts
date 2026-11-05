@@ -7,7 +7,7 @@ describe('Explorer file navigation and management', () => {
   it('indexes native session saves and opens exactly that file through the public API', async () => {
     const worker = mockWorker();
     worker.api.host.call.mockImplementation(async method => method === 'workspace.list' ? { workspaces: [{ id: 'workspace-1', name: 'Fixture', path: '/workspace', hostId: 'local' }], truncated: false } as any : { opened: true } as any);
-    const session = { ...parseSession(readFileSync('templates/countries.graphiql', 'utf8')), sessionId };
+    const session = { ...parseSession(readFileSync('../templates/countries.graphiql', 'utf8')), sessionId };
     await worker.hook('editor.save.before', { workspaceId: 'workspace-1', path: '/workspace/countries.graphiql', text: serializeSession(session) });
     const list = await worker.call('activity.list');
     expect(list[0].file).toEqual({ workspaceId: 'workspace-1', path: '/workspace/countries.graphiql' });

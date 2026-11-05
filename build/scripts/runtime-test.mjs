@@ -1,3 +1,5 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { getIntrospectionQuery } from 'graphql';

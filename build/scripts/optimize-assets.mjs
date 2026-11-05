@@ -1,3 +1,5 @@
+import { PLUGIN } from './paths.mjs';
+process.chdir(PLUGIN);
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
@@ -97,7 +99,7 @@ for (const path of files('editor').filter(path => path.endsWith('.css'))) {
     if (text.includes(oldName)) writeFileSync(reference, text.replaceAll(oldName, newName));
   }
 }
-for (const folder of ['images', 'assets/captures']) {
+for (const folder of ['images', 'build/assets/captures']) {
   for (const path of files(folder).filter(path => path.endsWith('.png'))) {
     const before = readFileSync(path);
     const after = await sharp(before).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
