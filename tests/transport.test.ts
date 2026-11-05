@@ -63,6 +63,20 @@ describe('worker safety and transport', () => {
     vi.mocked(fetch).mockResolvedValueOnce(json({ data: { huge: 'x'.repeat(800000) } }));
     expect((await worker.call('graphql.execute', request(id))).error.message).toContain('768 KiB');
   });
+  it('bounds the complete worker input, including custom headers', async () => {
+    const id = await approve();
+    vi.mocked(fetch).mockClear();
+    const headers = Object.fromEntries(Array.from({ length: 8 }, (_, i) => ['X-Example-' + i, 'x'.repeat(8000)]));
+    const result = await worker.call('graphql.execute', request(id, operation, { headers }));
+    expect(result.error).toMatchObject({ kind: 'limit', message: expect.stringContaining('60 KiB') });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+  it('rejects oversized connection inputs before saving credentials or networking', async () => {
+    const result = await worker.call('connection.approve', { sessionId, environment: environment(), allowInsecure: false, credential: { type: 'bearer', value: 'é'.repeat(32000), persist: true } });
+    expect(result.error.kind).toBe('limit');
+    expect(worker.secrets.size).toBe(0);
+    expect(fetch).not.toHaveBeenCalled();
+  });
   it('binds secure credentials to an exact endpoint, session and environment', async () => {
     await approve({}, { type: 'bearer', value: 'fixture-token', persist: true });
     const secretId = [...worker.secrets.keys()][0];

@@ -1,9 +1,10 @@
 {
+  "$schema": "https://raw.githubusercontent.com/stablyai/orca/main/docs/schemas/plugins/orca-plugin.v2.schema.json",
   "manifestVersion": 2,
   "publisher": "faisalmuhammad",
   "id": "graphiql",
   "name": "GraphiQL for Orca",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A GraphiQL integration for Orca with saved sessions, named environments, schema exploration, and secure authentication.",
   "engines": {
     "orca": ">=1.4.248"
@@ -83,6 +84,12 @@
       "path": "images/autocomplete.png",
       "alt": "Schema-aware GraphQL field completion in Orca's GraphiQL editor",
       "caption": "Schema-aware autocomplete",
+      "theme": "dark"
+    },
+    {
+      "path": "images/activity-panel.png",
+      "alt": "Countries query and Germany result beside GraphiQL Explorer with four sample sessions in Orca",
+      "caption": "GraphiQL Explorer session management",
       "theme": "dark"
     }
   ]

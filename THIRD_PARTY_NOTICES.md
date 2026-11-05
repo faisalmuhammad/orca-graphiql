@@ -1,5 +1,7 @@
 # Third-party credits and provenance
 
+Explorer layout inspiration: [Rich Presence for Discord](https://www.onorca.dev/plugins/jondmarien/orca-discord-presence) by [jondmarien](https://github.com/jondmarien). The Explorer implementation uses the plugin's original code and GraphQL assets.
+
 GraphiQL for Orca is an unofficial integration. The plugin's MIT license does not replace upstream licenses. [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt) preserves installed dependency license texts and Monaco's upstream third-party notices. Versions are recorded in `package-lock.json`.
 
 | Component | Provenance | License / notice |

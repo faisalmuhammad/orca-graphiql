@@ -1,10 +1,11 @@
 import { getOperationAST, parse, visit } from 'graphql';
 import type { JsonValue } from '../shared/orca-api';
-import { LIMITS, type Operation, type WireResponse } from '../shared/protocol';
+import { LIMITS, REQUEST_LIMIT_MESSAGE, type Operation, type WireResponse } from '../shared/protocol';
 import { runtimeHeadersSchema } from '../shared/session-schema';
 import { RequestError } from './errors';
 export function operationKind(operation: Operation): 'query' | 'mutation' {
-  if (!operation || typeof operation.query !== 'string' || Buffer.byteLength(JSON.stringify(operation)) > LIMITS.requestBytes) throw new RequestError('limit', 'Request exceeds the 256 KiB transport limit or has no query.');
+  if (!operation || typeof operation.query !== 'string') throw new RequestError('configuration', 'The operation has no GraphQL query.');
+  if (Buffer.byteLength(JSON.stringify(operation)) > LIMITS.requestBytes) throw new RequestError('limit', REQUEST_LIMIT_MESSAGE);
   let ast;
   try { ast = parse(operation.query); } catch { throw new RequestError('graphql', 'The operation is not valid GraphQL.'); }
   const selected = getOperationAST(ast, operation.operationName || undefined);
@@ -23,7 +24,7 @@ export async function httpExecute(endpoint: string, operation: Operation, header
   runtimeHeadersSchema.parse(headers);
   const body = JSON.stringify(operation);
   const requestBytes = Buffer.byteLength(body);
-  if (requestBytes > LIMITS.requestBytes) throw new RequestError('limit', 'Request exceeds the 256 KiB transport limit.');
+  if (requestBytes > LIMITS.requestBytes) throw new RequestError('limit', REQUEST_LIMIT_MESSAGE);
   const timer = new AbortController();
   const timeout = setTimeout(() => timer.abort(), timeoutMs);
   const signal = AbortSignal.any([parentSignal, timer.signal]);

@@ -5,7 +5,11 @@ import { join } from 'node:path';
 // Archive original captures once. Rebuild from them to avoid repeated framing.
 const originals = 'assets/captures';
 mkdirSync(originals, { recursive: true });
-const names = readdirSync('images').filter(name => name.endsWith('.png') && name !== 'icon.png' && !/^cover[0-9]*[.]png$/.test(name));
+const requested = process.argv.slice(2);
+if (requested.some(name => !/^[a-z0-9-]+[.]png$/i.test(name) || name === 'icon.png' || /^cover[0-9]*[.]png$/.test(name))) {
+  throw new Error('Specify screenshot PNG filenames, such as activity-panel.png.');
+}
+const names = requested.length ? requested : readdirSync('images').filter(name => name.endsWith('.png') && name !== 'icon.png' && !/^cover[0-9]*[.]png$/.test(name));
 for (const name of names) {
   const source = join(originals, name);
   if (!existsSync(source)) copyFileSync(join('images', name), source);

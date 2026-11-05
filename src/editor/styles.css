@@ -11,6 +11,10 @@ body { font: 13px system-ui, sans-serif; color: var(--orca-foreground); backgrou
 :is(.session-toolbar, .orca-dialog, .orca-graphiql > .notice) :focus-visible { outline: 2px solid var(--orca-ring); outline-offset: 2px; }
 .ide { flex: 1; min-height: 0; overflow: hidden; }
 .native-graphiql { height: 100%; }
+.native-graphiql, .native-graphiql [data-theme] {
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
 .connection-status { color: var(--orca-muted-foreground); margin-left: auto; font-size: 12px; }
 .orca-graphiql > .notice { padding: 8px 12px; display: flex; gap: 12px; align-items: center; background: var(--orca-muted); }
 .orca-graphiql > .notice span { flex: 1; }

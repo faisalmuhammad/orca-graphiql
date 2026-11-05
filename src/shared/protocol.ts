@@ -10,7 +10,10 @@ export type Connection = { approvalId: string; auth: Auth; temporary: boolean; w
 export type ExecuteInput = { approvalId: string; requestId: string; operation: Operation; headers?: Record<string, string>; confirmedMutation: boolean };
 export type WireResponse = { body: JsonValue; status: number; ok: boolean; totalMs: number; requestBytes: number; responseBytes: number };
 export type Activity = { sessionId: string; name: string; environment: string; status: string; lastRun: number | null; durationMs: number | null; editorId: string; connected: boolean; busy: boolean; readOnly: boolean; endpointHost?: string; production?: boolean; lastOperation?: { kind: 'query' | 'mutation'; name: string }; file?: { workspaceId: string; path: string } };
-export const LIMITS = { requestBytes: 256 * 1024, responseBytes: 768 * 1024, concurrent: 8, perEditor: 2, history: 50, storageBytes: 512 * 1024 };
+// Orca accepts at most 64 KiB of JSON input. Leave room for its request envelope.
+export const LIMITS = { requestBytes: 60 * 1024, responseBytes: 768 * 1024, concurrent: 8, perEditor: 2, history: 50, storageBytes: 512 * 1024 };
+export const REQUEST_LIMIT_MESSAGE = 'Request exceeds the 60 KiB limit, including variables, extensions, headers, and connection settings. Reduce the request before trying again.';
+export function requestTooLarge(value: unknown): boolean { return new TextEncoder().encode(JSON.stringify(value)).byteLength > LIMITS.requestBytes; }
 export function plainJson<T>(value: T): JsonValue { return JSON.parse(JSON.stringify(value)); }
 declare module 'orca' {
   interface PluginRequests {

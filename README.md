@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.2
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.3
    ```
 
-   Keep `#v0.1.2` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.3` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -29,7 +29,7 @@ The repository includes bundled editor assets, Monaco workers, the icon font, an
 
 ![Schema documentation with a Countries result — actual Orca capture](images/schema-browser.png)
 
-Editor previews are **actual Orca custom-editor captures**, presented with rounded corners on a GraphQL magenta gradient. The cover places a large Countries editor capture on the left, with the official GraphQL mark and a glowing plugin title on the right. All previews use the dark theme.
+Previews are **actual Orca editor and panel captures**, presented with rounded corners on a GraphQL magenta gradient. The cover places a large Countries editor capture on the left, with the official GraphQL mark and a glowing plugin title on the right. All previews use the dark theme.
 
 ## Create and use a session
 
@@ -75,14 +75,18 @@ Choose **Connect / Test**, then Execute. Expect **Germany**, **Berlin**, **EUR**
 | Native documents | Save, read-only handling, external changes, and conflict/reload workflow |
 | Host integration | Light/dark theme, local Monaco workers, multiple tabs, and resizable layouts |
 
-Explorer shows the environment, endpoint host, status, production/read-only designation, and recent operation timing. Rename requires an open writable editor; use Orca Save afterward. **Remove keeps the file** and asks for confirmation. Rename or delete the actual file through Orca's file explorer.
+Explorer has a theme-aware GraphQL overview showing session, connection, and running-request counts. Compact session cards show the environment, endpoint host, status, production/read-only designation, and recent operation timing. Rename requires an open writable editor; use Orca Save afterward. **Remove keeps the file** and asks for confirmation. Rename or delete the actual file through Orca's file explorer.
 
 <details>
-<summary>More dark editor previews</summary>
+<summary>More dark previews</summary>
 
 ![Connection settings — actual Orca capture](images/connection-settings.png)
 
 ![Schema-aware Monaco completion — actual Orca capture](images/autocomplete.png)
+
+![Countries query and result beside GraphiQL Explorer with four sample sessions — combined native Orca captures](images/activity-panel.png)
+
+The Explorer preview combines native editor and panel captures, showing a live Countries result with Local development, Staging, and Production sample sessions. The sample endpoints are disconnected; Staging and Production URLs are illustrative.
 
 </details>
 
@@ -106,7 +110,7 @@ Mark an environment **Production** to require mutation confirmation. This identi
 | TLS/network error | Check endpoint, certificates, and connectivity. TLS validation remains enabled. |
 | Endpoint URL rejected | Use HTTP(S) without URL credentials, query parameters, or fragments. Configure authentication through Connection settings. |
 
-Limits: **256 KiB operation payloads**, **768 KiB responses/documents**, **512 KiB local editor state per session/environment/endpoint**, **50 history entries**, **8 concurrent worker requests**, **2 per editor**. Execution timeouts are configurable from **1–90 seconds**.
+Limits: **60 KiB complete worker-request inputs**, **768 KiB responses/documents**, **512 KiB local editor state per session/environment/endpoint**, **50 history entries**, **8 concurrent worker requests**, **2 per editor**. Execution timeouts are configurable from **1–90 seconds**. Request sizing includes JSON encoding, variables, extensions, headers, and connection settings; the 60 KiB budget leaves room below Orca's 64 KiB bridge cap.
 
 Subscriptions, multipart responses, `@defer`/`@stream`, and chunked large responses are follow-up work. Windows/Linux remain untested; see [validation and limitations](COMPATIBILITY.md). Orca accepts only built-in sidebar activity icons, so the rail uses `code`; the panel, editor, plugin, and new-file action use the official GraphQL logo.
 
@@ -139,7 +143,7 @@ With the development plugin loaded, `npm run runtime:test` exercises Countries t
 
 Public host API contracts are defined in `src/shared/orca-api.ts`. Production builds minify the worker/sidebar, remove bundled text fonts and duplicate CSS, compress the complete icon font to inline WOFF2, preserve upstream lazy imports, and compress images losslessly. `npm run test:bundle` runs the worker fixture tests against the compiled worker. See [bundle size measurements](BUNDLE_SIZE.md).
 
-Original screenshots are preserved in `assets/captures/`. `npm run screenshots` rebuilds their gradient framing without resizing the captured interface. `npm run images` rebuilds the active cover. Original captures are excluded from the runtime ZIP.
+Original screenshots are preserved in `assets/captures/`. `npm run screenshots` rebuilds their gradient framing without resizing the captured interface; append `-- activity-panel.png` to rebuild only that preview. The Explorer preview crops Orca's path/chat chrome and unused space, and combines the native editor and panel captures. `npm run images` rebuilds the active cover. Original captures are excluded from the runtime ZIP.
 
 </details>
 

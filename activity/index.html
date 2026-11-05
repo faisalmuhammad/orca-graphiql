@@ -1,12 +1,32 @@
-<!doctype html><html><head><meta charset="utf-8"><title>GraphiQL Explorer</title><style>
-body{margin:0;padding:12px;font:13px system-ui,sans-serif;color:var(--orca-foreground);background:var(--orca-background)}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}h1{font-size:14px;margin:0;display:flex;align-items:center;gap:8px}h2{font-size:13px;margin:0}button{font:inherit;padding:5px 8px;border:1px solid var(--orca-border);border-radius:4px;color:inherit;background:var(--orca-card);cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:2px solid var(--orca-ring)}article{border:1px solid var(--orca-border);border-radius:var(--orca-radius,6px);padding:12px;margin-bottom:10px;background:var(--orca-card)}p{margin:6px 0;color:var(--orca-muted-foreground);line-height:1.5}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.status{font-size:12px;color:var(--orca-foreground)}[role=alert]{color:var(--orca-destructive)}
-.header-actions{display:flex;gap:8px;align-items:center}header{gap:8px;flex-wrap:wrap}.item-header{display:flex;align-items:center;gap:8px}.item-header h2{flex:1;min-width:0}.session-link{border:0;padding:0;background:transparent;text-align:left;font-weight:600;color:var(--orca-foreground);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-link:not(:disabled):hover{text-decoration:underline}.session-link:disabled{opacity:1}.icon-button{display:flex;align-items:center;justify-content:center;padding:5px;border-color:transparent;background:transparent}.icon-button:hover{background:var(--orca-accent)}.badge{font-size:11px;border:1px solid var(--orca-border);border-radius:3px;padding:1px 4px;color:var(--orca-foreground)}.endpoint{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}dialog{max-width:320px;border:1px solid var(--orca-border);border-radius:8px;padding:16px;background:var(--orca-popover);color:var(--orca-popover-foreground)}dialog::backdrop{background:#0008}label{display:grid;gap:8px}input{font:inherit;padding:8px;color:inherit;background:var(--orca-input);border:1px solid var(--orca-border);border-radius:4px;width:100%;box-sizing:border-box}dialog h2{margin-bottom:12px}
-</style></head><body>
-<header><h1><img src="../images/icon.png" alt="" width="20" height="20"> GraphiQL Explorer</h1><div class="header-actions"><button id="new-session" aria-label="New GraphiQL session"><img src="../images/icon.png" alt="" width="14" height="14"> New</button><button id="refresh" aria-label="Refresh session activity">Refresh</button></div></header>
-<p id="creation-status" role="status"></p>
-<p id="error" role="alert"></p><section id="sessions" aria-label="GraphiQL sessions"></section>
-<p>Click a saved session to open it. New creates an empty session in a local workspace and opens it. Rename changes its display name; Remove hides that session from Explorer and keeps its file. Rename or delete the actual file in Orca’s file explorer.</p>
-<dialog id="create-dialog" aria-labelledby="create-title"><form id="create-form"><h2 id="create-title">New GraphiQL session</h2><label>Workspace<select id="create-workspace" required></select></label><label>Filename<input id="create-filename" value="GraphiQL session" maxlength="90" required></label><p>A .graphiql file is created in the workspace root and opens automatically.</p><p id="create-error" role="alert"></p><div class="actions"><button id="create-cancel" type="button">Cancel</button><button id="create-submit" type="submit">Create and open</button></div></form></dialog>
-<dialog id="rename-dialog" aria-labelledby="rename-title"><form id="rename-form"><h2 id="rename-title">Rename session</h2><label>Session display name<input id="session-name" maxlength="128" required></label><p>Use Orca Save to persist the new name. The filename stays the same.</p><p id="rename-error" role="alert"></p><div class="actions"><button id="rename-cancel" type="button">Cancel</button><button id="rename-submit" type="submit">Rename</button></div></form></dialog>
-<dialog id="remove-dialog" aria-labelledby="remove-title"><h2 id="remove-title">Remove session from Explorer?</h2><p>Remove <strong id="remove-name"></strong> from the recent-session list?</p><p>The .graphiql file stays on disk. Reopen and save it in Orca to add it again.</p><p id="remove-error" role="alert"></p><div class="actions"><button id="remove-cancel" type="button" autofocus>Cancel</button><button id="remove-confirm" type="button">Remove</button></div></dialog>
-<script type="module" src="./main.js"></script></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>GraphiQL Explorer</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="panel-header">
+    <div class="brand"><span class="brand-icon"><img src="../images/icon.png" alt="" width="22" height="22"></span><div><h1>GraphiQL Explorer</h1><p class="brand-subtitle">Sessions &amp; endpoints</p></div></div>
+    <div class="header-actions">
+      <button id="new-session" class="new-button" aria-label="New GraphiQL session"><img src="../images/icon.png" alt="" width="14" height="14">New</button>
+      <button id="refresh" class="icon-button refresh-button" aria-label="Refresh session activity" title="Refresh sessions"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 3M4 15l2 3a7 7 0 0 0 12-1"/></svg></button>
+    </div>
+  </header>
+  <section class="workspace-summary" aria-label="Session overview">
+    <div class="summary-top"><span class="eyebrow">YOUR GRAPHQL WORKSPACE</span><span id="summary-state" class="summary-state" role="status">Loading…</span></div>
+    <div class="summary-total"><strong id="session-count">—</strong><span id="session-count-label">sessions</span></div>
+    <div class="summary-metrics"><span><i class="dot connected-dot" aria-hidden="true"></i><strong id="connected-count">—</strong> connected</span><span><i class="dot running-dot" aria-hidden="true"></i><strong id="running-count">—</strong> running</span></div>
+  </section>
+  <p id="creation-status" class="notice" role="status"></p>
+  <p id="error" class="notice error-notice" role="alert"></p>
+  <div class="section-heading"><h2>Sessions</h2><span>Click to open</span></div>
+  <section id="sessions" aria-label="GraphiQL sessions" aria-busy="true"></section>
+  <details class="panel-help"><summary>About your sessions</summary><p>New creates an empty session in a local workspace and opens it. Rename changes the display name. Remove hides a session from Explorer and keeps its file. Use Orca’s file explorer to rename or delete the file itself.</p></details>
+  <dialog id="create-dialog" aria-labelledby="create-title"><form id="create-form"><span class="dialog-eyebrow">NEW SESSION</span><h2 id="create-title">New GraphiQL session</h2><label>Workspace<select id="create-workspace" required></select></label><label>Filename<input id="create-filename" value="GraphiQL session" maxlength="90" required></label><p>A .graphiql file is created in the workspace root and opens automatically.</p><p id="create-error" role="alert"></p><div class="dialog-actions"><button id="create-cancel" type="button">Cancel</button><button id="create-submit" class="primary-button" type="submit">Create and open</button></div></form></dialog>
+  <dialog id="rename-dialog" aria-labelledby="rename-title"><form id="rename-form"><span class="dialog-eyebrow">SESSION DETAILS</span><h2 id="rename-title">Rename session</h2><label>Session display name<input id="session-name" maxlength="128" required></label><p>Use Orca Save to persist the new name. The filename stays the same.</p><p id="rename-error" role="alert"></p><div class="dialog-actions"><button id="rename-cancel" type="button">Cancel</button><button id="rename-submit" class="primary-button" type="submit">Rename</button></div></form></dialog>
+  <dialog id="remove-dialog" aria-labelledby="remove-title"><span class="dialog-eyebrow">EXPLORER ENTRY</span><h2 id="remove-title">Remove this session?</h2><p>Remove <strong id="remove-name"></strong> from Explorer?</p><p class="file-preserved">The .graphiql file stays on disk.</p><p>Reopen and save it in Orca to add it again.</p><p id="remove-error" role="alert"></p><div class="dialog-actions"><button id="remove-cancel" type="button" autofocus>Cancel</button><button id="remove-confirm" class="danger-button" type="button">Remove</button></div></dialog>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

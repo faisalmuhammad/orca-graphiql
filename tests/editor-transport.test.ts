@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import type { OrcaFrameApi } from '../src/shared/orca-api';
 import { createWorkerTransport } from '../src/editor/transport';
 import { environmentSchema } from '../src/shared/session-schema';
+import { LIMITS } from '../src/shared/protocol';
 function setup(production = false) {
   const request = vi.fn(async (_name, input) => { expect(input).toStrictEqual(JSON.parse(JSON.stringify(input))); return { ok: true, value: { body: { data: { hello: 'ok' } }, status: 200, ok: true, totalMs: 1, requestBytes: 1, responseBytes: 1 } }; });
   const confirmMutation = vi.fn().mockResolvedValue(true);
+  const failure = vi.fn();
   const environment = environmentSchema.parse({ id: 'dev', name: 'Dev', endpoint: 'https://example.com/graphql', production });
-  const bridge = createWorkerTransport({ plugin: { request } } as unknown as OrcaFrameApi, environment, 'approval', { status: vi.fn(), failure: vi.fn(), confirmMutation });
-  return { bridge, request, confirmMutation };
+  const bridge = createWorkerTransport({ plugin: { request } } as unknown as OrcaFrameApi, environment, 'approval', { status: vi.fn(), failure, confirmMutation });
+  return { bridge, request, confirmMutation, failure };
 }
 describe('official GraphiQL transport adapter', () => {
   it('sends only JSON across Orca IPC, including GraphiQL undefined optional fields', async () => {
@@ -19,6 +21,30 @@ describe('official GraphiQL transport adapter', () => {
     const { bridge, request } = setup();
     await bridge.transport.send({ query: '{ hello }', variables: { code: 'DE', optional: null }, extensions: { trace: true } });
     expect(request.mock.calls[0][1].operation).toStrictEqual({ query: '{ hello }', variables: { code: 'DE', optional: null }, extensions: { trace: true } });
+  });
+  it('accepts a complete request near the safe bridge limit', async () => {
+    const { bridge, request } = setup();
+    await bridge.transport.send({ query: '{ hello }', variables: { padding: 'x'.repeat(LIMITS.requestBytes - 500) } });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(new TextEncoder().encode(JSON.stringify(request.mock.calls[0][1])).byteLength).toBeLessThanOrEqual(LIMITS.requestBytes);
+  });
+  it('counts headers, extensions, UTF-8 and JSON escaping before calling the worker', async () => {
+    const { bridge, request, failure } = setup();
+    for (const extra of [
+      { variables: { value: 'é'.repeat(32000) } },
+      { variables: { value: String.fromCharCode(10).repeat(32000) } },
+      { extensions: { value: 'x'.repeat(32000) }, headers: { 'X-Example': 'x'.repeat(32000) } },
+    ]) {
+      await expect(bridge.transport.send({ query: '{ hello }', ...extra })).rejects.toThrow('60 KiB');
+    }
+    expect(request).not.toHaveBeenCalled();
+    expect(failure).toHaveBeenCalledWith(expect.objectContaining({ kind: 'limit' }));
+  });
+  it('rejects oversized production mutations before asking for confirmation', async () => {
+    const { bridge, request, confirmMutation } = setup(true);
+    await expect(bridge.transport.send({ query: 'mutation { increment }', variables: { value: 'x'.repeat(LIMITS.requestBytes) } })).rejects.toThrow('60 KiB');
+    expect(request).not.toHaveBeenCalled();
+    expect(confirmMutation).not.toHaveBeenCalled();
   });
   it('does not request networking before explicit connection approval', async () => {
     const request = vi.fn();

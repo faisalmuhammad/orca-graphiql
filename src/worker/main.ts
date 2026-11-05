@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { OrcaWorkerApi, PanelRequestContext } from '../shared/orca-api';
 import { environmentSchema, canonicalEndpoint, isRemoteHttp, runtimeHeadersSchema, parseSession, type Environment } from '../shared/session-schema';
-import { LIMITS, type Activity, type ApprovalInput, type Connection, type ExecuteInput } from '../shared/protocol';
+import { LIMITS, requestTooLarge, REQUEST_LIMIT_MESSAGE, type Activity, type ApprovalInput, type Connection, type ExecuteInput } from '../shared/protocol';
 import { resolveCredentials, secureAvailable } from './credentials';
 import { outcome, RequestError } from './errors';
 import { httpExecute, operationKind } from './transport';
@@ -75,6 +75,7 @@ export default function activate(orca: OrcaWorkerApi) {
     approval.lastUsed = Date.now(); return approval;
   }
   async function execute(input: ExecuteInput, context: PanelRequestContext) {
+    if (requestTooLarge(input)) throw new RequestError('limit', REQUEST_LIMIT_MESSAGE);
     const approval = getApproval(input.approvalId, context.panel.id);
     const kind = operationKind(input.operation);
     if (approval.environment.production && kind === 'mutation' && input.confirmedMutation !== true) throw new RequestError('production', 'Confirm this mutation before sending it to the production environment.');
@@ -97,6 +98,7 @@ export default function activate(orca: OrcaWorkerApi) {
   }
   orca.panels.handle('connection.protection', () => outcome(async () => ({ secure: await secureAvailable(orca) })));
   orca.panels.handle('connection.approve', (input: ApprovalInput, context) => outcome(async (): Promise<Connection> => {
+    if (requestTooLarge(input)) throw new RequestError('limit', REQUEST_LIMIT_MESSAGE);
     if (!/^[0-9a-f-]{36}$/i.test(input.sessionId)) throw new RequestError('configuration', 'The session has no valid identifier.');
     const environment = environmentSchema.parse(input.environment);
     const previousAuth = environment.auth;

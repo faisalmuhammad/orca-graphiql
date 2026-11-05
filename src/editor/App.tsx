@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GraphQLSchema } from 'graphql';
 import type { OrcaFrameApi } from '../shared/orca-api';
 import { isRemoteHttp, type Environment, type Session } from '../shared/session-schema';
-import type { Connection, CredentialInput, Failure } from '../shared/protocol';
+import { requestTooLarge, REQUEST_LIMIT_MESSAGE, type Connection, type CredentialInput, type Failure } from '../shared/protocol';
 import type { ConflictDraft, SessionController } from '../persistence/session';
 import { createCollectionsStorage } from '../persistence/collections';
 import { createSessionStorage, type SessionStorage } from '../persistence/storage';
@@ -87,7 +87,9 @@ export function App({ host, controller }: { host: OrcaFrameApi; controller: Sess
     try {
       if (isRemoteHttp(environment.endpoint)) { allowInsecure = await ask('Unencrypted endpoint', 'This remote HTTP endpoint exposes requests and credentials on the network. Connect to ' + environment.endpoint + '?'); if (!allowInsecure || generation !== epoch.current) return; }
       const abort = new AbortController(); attemptAbort = abort; connectAbort.current = abort; setStatus('Connecting'); setError('');
-      const result = await host.plugin.request('connection.approve', { sessionId: controller.sessionId, environment, allowInsecure, ...(pending?.environmentId === environment.id && pending.endpoint === environment.endpoint ? { credential: pending.input } : {}) }, { signal: abort.signal, timeoutMs: environment.timeoutMs + 10000 });
+      const input = { sessionId: controller.sessionId, environment, allowInsecure, ...(pending?.environmentId === environment.id && pending.endpoint === environment.endpoint ? { credential: pending.input } : {}) };
+      if (requestTooLarge(input)) throw new Error(REQUEST_LIMIT_MESSAGE);
+      const result = await host.plugin.request('connection.approve', input, { signal: abort.signal, timeoutMs: environment.timeoutMs + 10000 });
       if (generation !== epoch.current) return;
       if (!result.ok) { failure(result.error); return; }
       const nextEnvironment = { ...environment, auth: result.value.auth };

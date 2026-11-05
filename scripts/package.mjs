@@ -20,7 +20,10 @@ function collect(dir, prefix = '') {
 }
 collect(folder);
 const bytes = files.reduce((sum, file) => sum + file.data.length, 0);
-if (bytes > 50 * 1024 * 1024 || files.length > 2000 || files.some(file => /\.(m?js)$/.test(file.name) && file.data.length > 16 * 1024 * 1024)) throw new Error('Distribution exceeds Orca package limits');
+const entries = new Set([...(manifest.contributes?.panels || []), ...(manifest.contributes?.customEditors || [])].flatMap(item => typeof item.entry === 'string' ? [release + '/' + item.entry] : []));
+if (bytes > 50 * 1024 * 1024 || files.length > 2000
+  || files.some(file => entries.has(file.name) && file.data.length > 10 * 1024 * 1024)
+  || files.some(file => /\.(ts|tsx|mts|jsx)$/.test(file.name) && file.data.length > 1024 * 1024)) throw new Error('Distribution exceeds Orca package limits');
 const crcTable = Array.from({ length: 256 }, (_, value) => { for (let bit = 0; bit < 8; bit++) value = value & 1 ? 0xedb88320 ^ value >>> 1 : value >>> 1; return value >>> 0; });
 const crc32 = data => { let crc = 0xffffffff; for (const byte of data) crc = crcTable[(crc ^ byte) & 255] ^ crc >>> 8; return (crc ^ 0xffffffff) >>> 0; };
 const local = [], central = []; let offset = 0;
