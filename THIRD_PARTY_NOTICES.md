@@ -18,7 +18,7 @@ GraphiQL for Orca is an unofficial integration. The plugin's MIT license does no
 | Countries example | [Trevor Blades](https://github.com/trevorblades/countries), countries.trevorblades.com | External service; server source not bundled |
 | Browser validation | [Playwright](https://github.com/microsoft/playwright) with local Google Chrome; temporary test tooling, not bundled | Playwright Apache 2.0; browser not redistributed |
 
-`scripts/notices.mjs` records installed runtime dependencies, peer/optional packages, direct development tools, and original screenshot font notices. It can conservatively include installed optional packages not emitted into the bundle.
+`scripts/notices.mjs` records installed runtime dependencies, peer/optional packages, direct development tools, and original screenshot font notices. It can conservatively include installed optional packages not emitted into the bundle. The generated TXT starts with a package index linking every credited package to its `NOTICE-…` documents. Only byte-identical documents share a reference; each distinct original copyright, license, and notice text is included verbatim. This avoids repeated legal text without removing attribution or license terms.
 
 Two npm packages omit license text. `licenses/react-remove-scroll-bar.txt` supplies its upstream MIT notice; `licenses/react-compiler-runtime.txt` supplies the React root MIT notice inherited by that package. Both enter the generated collection.
 

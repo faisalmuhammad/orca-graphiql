@@ -1,11 +1,11 @@
 {
   "name": "orca-graphiql",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "vite build && node scripts/build-worker.mjs && node scripts/optimize-assets.mjs",
+    "build": "vite build && node scripts/build-editor-workers.mjs && node scripts/build-worker.mjs && node scripts/optimize-assets.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:bundle": "node scripts/test-bundle.mjs",

@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.3
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.4
    ```
 
-   Keep `#v0.1.3` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.4` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -123,7 +123,7 @@ To work on the plugin locally, clone this repository and add its root through **
 
 Release tags must include the compiled `editor/`, `worker/`, and `activity/` assets. Orca loads these directly without building the source. `node_modules/`, `.orca/`, and `dist/` are excluded from Git.
 
-UI and editor text use system fonts. The complete Monaco icon font is compressed to WOFF2 and embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks in the source tree and tracked files. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed.
+UI and editor text use system fonts. The complete Monaco icon font is compressed to WOFF2 and embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks, checks Orca's documented source-folder and entry limits, and enforces a stricter project budget of 1 MiB per editor JavaScript chunk. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed, then stage additions and removals with `git add .` before checking tracked files.
 
 ```sh
 npm ci
@@ -141,7 +141,7 @@ Orca's test runner supplies its native document host; ordinary Vitest skips thos
 
 With the development plugin loaded, `npm run runtime:test` exercises Countries through the actual worker; `npm run runtime:fixture` verifies authentication, redirects, disabled introspection, and production mutations using a local fixture. `npm run package` builds a runtime-only ZIP with size measurements and SHA-256 checksums under `dist/`.
 
-Public host API contracts are defined in `src/shared/orca-api.ts`. Production builds minify the worker/sidebar, remove bundled text fonts and duplicate CSS, compress the complete icon font to inline WOFF2, preserve upstream lazy imports, and compress images losslessly. `npm run test:bundle` runs the worker fixture tests against the compiled worker. See [bundle size measurements](BUNDLE_SIZE.md).
+Public host API contracts are defined in `src/shared/orca-api.ts`. Production builds minify the worker/sidebar, remove bundled text fonts and duplicate CSS, compress the complete icon font to inline WOFF2, preserve upstream lazy imports, and compress images losslessly. Release 0.1.4 selects Monaco's editing features, splits vendor code into smaller local chunks, and shares infrastructure between the three local module workers. Schema autocomplete, validation, documentation, formatting, find, and keyboard editing remain available; optional Monaco extras such as CodeLens, color pickers, inlay hints, and sticky scroll are omitted. Splitting improves file granularity; feature selection and shared workers reduce total bytes. `npm run test:bundle` runs the worker fixture tests against the compiled worker. See [bundle size measurements](BUNDLE_SIZE.md).
 
 Original screenshots are preserved in `assets/captures/`. `npm run screenshots` rebuilds their gradient framing without resizing the captured interface; append `-- activity-panel.png` to rebuild only that preview. The Explorer preview crops Orca's path/chat chrome and unused space, and combines the native editor and panel captures. `npm run images` rebuilds the active cover. Original captures are excluded from the runtime ZIP.
 
@@ -160,4 +160,4 @@ An unofficial integration of [GraphiQL](https://github.com/graphql/graphiql), ma
 | Fira Code (original screenshots) | SIL OFL 1.1 | [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
 | Roboto (original screenshots) | Apache 2.0 | [LICENSE-ROBOTO](LICENSE-ROBOTO) |
 
-Plugin code uses [MIT](LICENSE). See [credits/provenance](THIRD_PARTY_NOTICES.md) and [complete license texts](THIRD_PARTY_NOTICES.txt), including development tools.
+Plugin code uses [MIT](LICENSE). See [credits/provenance](THIRD_PARTY_NOTICES.md) and [complete license texts](THIRD_PARTY_NOTICES.txt), including development tools. Identical legal documents are printed once with a package index; all distinct original copyright and license text remains included.

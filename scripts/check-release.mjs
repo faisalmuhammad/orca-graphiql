@@ -5,6 +5,9 @@ import { join } from 'node:path';
 const ignored = new Set(['.git', '.orca', 'node_modules', 'dist', '.DS_Store', 'Thumbs.db']);
 const files = new Set();
 const issues = [];
+const manifest = JSON.parse(readFileSync('orca-plugin.json', 'utf8'));
+const entries = new Set([...(manifest.contributes?.panels || []), ...(manifest.contributes?.customEditors || [])].map(item => item.entry));
+let totalBytes = 0;
 function collect(folder = '.') {
   for (const name of readdirSync(folder)) {
     if (ignored.has(name)) continue;
@@ -28,6 +31,11 @@ for (const path of files) {
     if (stat.isSymbolicLink()) { issues.push(path + ': symlink'); continue; }
     data = readFileSync(path);
   } catch { issues.push(path + ': missing or unreadable tracked file'); continue; }
+  totalBytes += data.length;
+  if (entries.has(path.replaceAll('\\', '/')) && data.length > 10 * 1024 * 1024) issues.push(path + ': exceeds the Orca 10 MiB entry limit');
+  if (/[.](ts|tsx|mts|jsx)$/i.test(path) && data.length > 1024 * 1024) issues.push(path + ': exceeds the Orca 1 MiB transpilation limit');
+  // A stricter project budget for editor scripts; this is not an Orca limit.
+  if (/^editor[\\/]assets[\\/].*[.]js$/.test(path) && data.length > 1024 * 1024) issues.push(path + ': exceeds the 1 MiB editor-chunk budget');
   const isImage = /[.](png|jpe?g|webp|gif)$/i.test(path);
   if (isImage) {
     const valid = data.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
@@ -40,7 +48,9 @@ for (const path of files) {
   try { decoder.decode(data); if (data.includes(0)) throw new Error('binary'); }
   catch { issues.push(path + ': non-image binary file'); }
 }
+if (files.size > 2000) issues.push('Plugin source folder exceeds the Orca 2,000-file limit');
+if (totalBytes > 50 * 1024 * 1024) issues.push('Plugin source folder exceeds the Orca 50 MiB total-size limit');
 if (issues.length) {
   console.error('Release file check failed:\n' + [...new Set(issues)].join('\n'));
   process.exitCode = 1;
-} else console.log('Release file check passed: ' + files.size + ' text/image files, no non-image binaries or symlinks.');
+} else console.log('Release file check passed: ' + files.size + ' text/image files, ' + totalBytes + ' bytes, no non-image binaries or symlinks; Orca limits and the editor-chunk budget passed.');

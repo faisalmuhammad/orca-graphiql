@@ -1,6 +1,6 @@
 # Bundle size audit
 
-Measurements compare the bundled 0.1.1 release with the optimized 0.1.2 build. All sizes are uncompressed unless specified.
+The historical table compares 0.1.1 with 0.1.2; the latest audit below compares 0.1.3 with 0.1.4. All sizes are uncompressed unless specified.
 
 | Component | 0.1.1 | 0.1.2 |
 | --- | ---: | ---: |
@@ -26,7 +26,7 @@ The audit covered the editor dependency graph, HTTP worker, sidebar, CSS/font as
 - Recompress PNGs only when the output is smaller and decoded pixels match exactly. Original capture pixels and the approved cover design are preserved.
 - Run the deterministic worker fixture tests against the compiled worker as well as the TypeScript implementation.
 
-## Remaining opportunities
+## Remaining opportunities at 0.1.2
 
 Monaco's full feature registration and GraphiQL's formatting/schema tooling account for most remaining JavaScript. Removing editor contributions, changing validation libraries, or replacing upstream formatters would require a separate compatibility investigation. React, GraphQL, and Monaco dependency versions are already deduplicated; no duplicate package versions were found to remove. Monaco's editor features and the upstream GraphQL/JSONC formatters are retained.
 
@@ -43,3 +43,26 @@ The table above records the 0.1.2 size work. Release 0.1.3 retains those optimiz
 The expanded regression suite passes 50 native/source tests and 46 compiled-worker tests (four native tests skipped by plain Vitest). Headless Chrome confirms that normal fixture execution still works and oversized Unicode variables show a clear error without crossing IPC. The package guard now matches the authoring guide's file-count, folder-size, entry-size, and transpilation limits.
 
 The redesigned Explorer keeps the same worker contract and adds no runtime dependency. Its readable HTML/CSS lives under src/activity; the build copies its HTML and minifies its stylesheet alongside the existing script. Sidebar styling adds only a small amount to the overall package; current exact measurements remain in dist/artifact.json.
+
+## Smaller chunks and shared workers: 0.1.4
+
+| Component | 0.1.3 | 0.1.4 |
+| --- | ---: | ---: |
+| Editor directory | 7.59 MB | 6.80 MB |
+| Largest editor JavaScript chunk | 2.27 MB | 0.82 MB |
+| Editor entry script | 1.27 MB | 0.60 MB |
+| Monaco/GraphQL worker scripts, including shared chunks | 1.20 MB | 0.80 MB |
+| Third-party notice collection | 0.85 MB | 0.71 MB |
+| Entire runtime folder | 10.03 MB | 9.12 MB |
+| Release ZIP | 3.29 MB | 3.08 MB |
+
+The editor directory is 6,804,800 bytes, saving 788,190 bytes (10.4%) over the published 0.1.3 tag. Its largest JavaScript chunk is 820,061 bytes. Exact final runtime-folder and ZIP measurements are in `dist/artifact.json`; documentation changes can affect those totals slightly. The cover, preview PNGs, and original captures are unchanged.
+
+- Select Monaco's public feature registrations instead of registering every optional UI contribution. Suggestions/snippets, diagnostics, hover, find, formatting, folding, clipboard/navigation, and accessibility registrations remain. Optional extras such as CodeLens, color pickers, inlay hints, sticky scroll, and GPU action controls are omitted. Monaco's worker helper also imports UI controllers; the build removes only the optional registrations and guards against an unexpected upstream helper change. Worker creation, model synchronization, and Trusted Types logic remain intact.
+- Use Vite/Rollup manual vendor chunks with `onlyExplicitManualChunks`. All 34 editor JavaScript files are below the project's 1 MiB budget. This is a stricter project limit, not an Orca requirement. Splitting alone does not reduce total bytes or guarantee fewer startup downloads: static imports still load their chunks.
+- Build the editor, JSON, and GraphQL module workers together with esbuild ESM splitting. Eight local scripts share infrastructure and total 803,379 bytes; the old three standalone workers totaled 1,199,365 bytes. The build updates the upstream constructor URLs and removes obsolete standalone outputs without changing labels or lifecycle.
+- Index every credited package and print byte-identical legal documents once. All 115 installed packages and original screenshot fonts remain credited; 58 distinct original legal documents retain their verbatim texts. The notice collection shrinks from 847,332 to 713,488 bytes.
+
+The official GraphiQL React application is unchanged. Schema autocomplete, unknown-field diagnostics, native JSON-variable validation, GraphQL/JSONC formatting, Variables/Headers, themes, system fonts, and local icon loading pass the built-editor browser check with the compiled worker and deterministic fixture. No browser errors or external asset requests were observed. TypeScript, 50 Orca native/source tests, 46 compiled-worker tests (four native tests skipped), and Orca manifest/static checks pass.
+
+Orca's documented limits apply to the entire plugin folder (2,000 files / 50 MiB), an actual panel/editor entry (10 MiB), and each file Orca transpiles (1 MiB). The HTML editor entry remains 343 bytes. The public manual-review `code` and `size` thresholds are not disclosed; this optimization does not guarantee that review will clear. This build has browser and native-host test evidence, but its newly shared workers have not been exercised in an actual Orca editor tab. Existing Orca GUI evidence is from earlier builds.
