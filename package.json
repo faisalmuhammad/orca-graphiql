@@ -1,6 +1,6 @@
 {
   "name": "orca-graphiql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -17,7 +17,8 @@
     "test:orca": "orca plugin test . --json",
     "images": "node scripts/images.mjs",
     "screenshots": "node scripts/screenshots.mjs",
-    "package": "npm run build && npm run notices && node scripts/package.mjs"
+    "release:check": "node scripts/check-release.mjs",
+    "package": "npm run build && npm run notices && npm run release:check && node scripts/package.mjs"
   },
   "dependencies": {
     "@graphiql/react": "1.0.1",

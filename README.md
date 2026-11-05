@@ -6,7 +6,7 @@ Bring [GraphiQL](https://github.com/graphql/graphiql) into [Orca](https://onorca
 
 [![Orca 1.4.248+](https://img.shields.io/badge/Orca-1.4.248%2B-a87ffb)](https://onorca.dev) [![GraphiQL 6](https://img.shields.io/badge/GraphiQL-6-333e4f)](https://github.com/graphql/graphiql) [![Desktop](https://img.shields.io/badge/platform-desktop-333e4f)](COMPATIBILITY.md) [![MIT license](https://img.shields.io/badge/license-MIT-17b877)](LICENSE)
 
-![GraphQL mark and Countries editor on a dark magenta cover](images/cover.png)
+![Large Countries editor, GraphQL logo, and glowing GraphiQL for Orca title on a dark magenta cover](images/cover.png)
 
 ## Install
 
@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.0
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.1
    ```
 
-   Keep `#v0.1.0` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.1` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -29,7 +29,7 @@ The repository includes bundled editor assets, Monaco workers, fonts, and networ
 
 ![Schema documentation with a Countries result — actual Orca capture](images/schema-browser.png)
 
-Editor previews are **actual Orca custom-editor captures**, presented with rounded corners on a GraphQL magenta gradient. The cover combines the official GraphQL mark with a framed Countries editor capture, composed for Orca's cropped plugin banner. All previews use the dark theme.
+Editor previews are **actual Orca custom-editor captures**, presented with rounded corners on a GraphQL magenta gradient. The cover places a large Countries editor capture on the left, with the official GraphQL mark and a glowing plugin title on the right. All previews use the dark theme.
 
 ## Create and use a session
 
@@ -118,6 +118,8 @@ Requires Node.js 22+ and npm.
 To work on the plugin locally, clone this repository and add its root through **Settings → Plugins → Development folders…**.
 
 Release tags must include the compiled `editor/`, `worker/`, and `activity/` assets. Orca loads these directly without building the source. `node_modules/`, `.orca/`, and `dist/` are excluded from Git.
+
+Fonts are embedded in the local CSS because the public indexer rejects standalone binary font files. Run `npm run release:check` before tagging; it rejects non-image binary files and symlinks in the source tree and tracked files. When uploading files manually, replace the whole `editor/` folder so obsolete assets are removed.
 
 ```sh
 npm ci

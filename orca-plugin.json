@@ -1,8 +1,9 @@
 {
   "manifestVersion": 2,
+  "publisher": "faisalmuhammad",
   "id": "graphiql",
   "name": "GraphiQL for Orca",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A GraphiQL integration for Orca with saved sessions, named environments, schema exploration, and secure authentication.",
   "engines": {
     "orca": ">=1.4.248"
@@ -60,5 +61,29 @@
     "url": "https://github.com/faisalmuhammad"
   },
   "repository": "https://github.com/faisalmuhammad/orca-graphiql",
-  "icon": "images/icon.png"
+  "icon": "images/icon.png",
+  "cover": {
+    "path": "images/cover.png",
+    "alt": "Large Countries query/result editor on the left, with the GraphQL logo and glowing GraphiQL for Orca title on the right"
+  },
+  "screenshots": [
+    {
+      "path": "images/schema-browser.png",
+      "alt": "GraphiQL schema documentation and Countries query/result in Orca",
+      "caption": "Schema documentation and query results",
+      "theme": "dark"
+    },
+    {
+      "path": "images/connection-settings.png",
+      "alt": "GraphiQL connection settings for the Countries endpoint in Orca",
+      "caption": "Endpoint and authentication settings",
+      "theme": "dark"
+    },
+    {
+      "path": "images/autocomplete.png",
+      "alt": "Schema-aware GraphQL field completion in Orca's GraphiQL editor",
+      "caption": "Schema-aware autocomplete",
+      "theme": "dark"
+    }
+  ]
 }

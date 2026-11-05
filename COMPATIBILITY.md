@@ -2,9 +2,13 @@
 
 Requires Orca desktop **1.4.248 or newer**. Runtime checks were performed on Orca **1.4.248**, macOS, on 2026-11-04. Windows/Linux remain untested.
 
+Runtime evidence comes from local development loading. Installation from the public release tag has not yet been exercised.
+
 ## Integration
 
 GraphiQL 6.0.0 runs in an isolated central editor with React 19.3.1, GraphQL 16.15.0, toolkit 1.0.0, and Collections. HTTP requests use a trusted worker through public Orca APIs. Monaco workers, fonts, scripts, and styles are bundled locally.
+
+Fonts are embedded as CSS data URLs. Release 0.1.1 removes the standalone Codicon TTF rejected by the public indexer in 0.1.0; `npm run release:check` checks for non-image binary files and symlinks before packaging.
 
 The transport uses GraphiQL 6's supported `Transport` interface. Operations are normalized to JSON before IPC because Orca rejects undefined properties. The native Variables/Headers strip has a minimal host CSS/event adaptation to keep tabs visible while collapsed and expand the selected tab.
 
@@ -21,4 +25,4 @@ The transport uses GraphiQL 6's supported `Transport` interface. Operations are 
 - Windows/Linux, exhaustive split-pane and keyboard behavior, the full external-edit matrix, and startup CPU/memory profiling need further validation. HTML panel screenshot input is unsupported, so Explorer coverage combines captures and handler tests.
 - Orca accepts built-in sidebar activity icons only; the rail uses `code`. Image-capable contributions use the GraphQL logo.
 - Discovery is bounded to 16 local workspaces, depth 8, 5,000 entries, two seconds, and 64 matches. It skips hidden/build/vendor directories, symlinks, malformed and oversized files. Sessions without identifiers need an open/save; duplicate copied identifiers are omitted from automatic discovery.
-- Requests are limited to 256 KiB; responses/documents to 768 KiB. Oversized responses are rejected whole. Redirects are refused. Subscriptions, multipart incremental responses, and chunked large responses are unsupported.
+- GraphQL operation payloads are limited to 256 KiB; responses/documents to 768 KiB. Local editor state is bounded to 512 KiB per session/environment/endpoint. Collections omit variables and headers. Endpoint URLs cannot contain credentials, query parameters, or fragments. Oversized responses are rejected whole. Redirects are refused. Subscriptions, multipart incremental responses, and chunked large responses are unsupported.

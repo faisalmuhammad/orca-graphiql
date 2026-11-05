@@ -3,15 +3,14 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import GraphQLLogo from '../node_modules/@graphiql/react/dist/icons/graphql-logo.svg_react.js';
 
-// Match the sibling covers' canvas. Orca center-crops it to a wide banner:
-// keep the mark and Countries query/result inside the central banner band.
+// Compose the full cover around a large native editor capture and the GraphQL mark.
 const width = 1600;
 const height = 1000;
-const logoSize = 250;
-const center = { x: 280, y: 500 };
-const editor = { x: 544, y: 316, width: 960, height: 368, chrome: 30 };
+const logoSize = 276;
+const center = { x: 1400, y: 380 };
+const editor = { x: 46, y: 122, width: 1160, height: 755, chrome: 30 };
 const output = 'images/cover.png';
-const baseStops = '<stop stop-color="#151326"/><stop offset=".35" stop-color="#3d1838"/><stop offset=".67" stop-color="#501743"/><stop offset="1" stop-color="#1b1931"/>';
+const baseStops = '<stop stop-color="#18122d"/><stop offset=".35" stop-color="#442044"/><stop offset=".67" stop-color="#6e1b55"/><stop offset="1" stop-color="#251730"/>';
 let seed = 731;
 const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296; };
 const stars = Array.from({ length: 135 }, () => {
@@ -50,9 +49,8 @@ const artwork = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${wi
   <rect width="100%" height="100%" fill="url(#vignette)"/>
   <rect x="${editor.x - 1}" y="${editor.y - 1}" width="${editor.width + 2}" height="${editor.height + 2}" rx="14" fill="#26202e" stroke="#a1427d" stroke-opacity=".7" filter="url(#shadow)"/>
 </svg>`);
-// Crop/scaling only: preserve the real native editor and Germany response.
+// Preserve the complete real editor, including its connection bar and native tabs.
 const capture = await sharp('assets/captures/cover-editor.png')
-  .extract({ left: 0, top: 48, width: 1280, height: 450 })
   .resize(editor.width, editor.height - editor.chrome).png().toBuffer();
 const chrome = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${editor.width}" height="${editor.height}"><rect width="100%" height="100%" fill="#151b25"/><path d="M0 29.5H${editor.width}" stroke="#303442"/><circle cx="20" cy="15" r="4.5" fill="#ff5f57"/><circle cx="36" cy="15" r="4.5" fill="#febc2e"/><circle cx="52" cy="15" r="4.5" fill="#28c840"/><text x="78" y="19" fill="#91a0b2" font-family="Arial, sans-serif" font-size="12">countries.graphiql</text></svg>`);
 const framed = await sharp(chrome).composite([{ input: capture, left: 0, top: editor.chrome }]).png().toBuffer();
@@ -62,10 +60,18 @@ const svg = renderToStaticMarkup(createElement(GraphQLLogo, { width: logoSize, h
 const logo = await sharp(Buffer.from(svg)).png().toBuffer();
 const glow = await sharp({ create: { width: logoSize + 120, height: logoSize + 120, channels: 4, background: '#0000' } })
   .composite([{ input: logo, left: 60, top: 60 }]).png().toBuffer();
-const blurredGlow = await sharp(glow).blur(22).linear(0.6, 0).png().toBuffer();
+const blurredGlow = await sharp(glow).blur(22).linear(0.85, 0).png().toBuffer();
+const title = Buffer.from(`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='210'>
+  <defs><filter id='textGlow' x='-40%' y='-60%' width='180%' height='220%'><feDropShadow dx='0' dy='0' stdDeviation='12' flood-color='#ff2fbc' flood-opacity='.6'/><feDropShadow dx='0' dy='0' stdDeviation='3' flood-color='#ff79d8' flood-opacity='.5'/></filter></defs>
+  <g font-family='Arial, sans-serif' text-anchor='middle' filter='url(#textGlow)'>
+    <text x='200' y='78' fill='#fff2fc' font-size='58' font-weight='700' letter-spacing='-1.5'>GraphiQL</text>
+    <text x='200' y='140' fill='#ffd0ee' font-size='40' font-weight='600' letter-spacing='-.5'>for Orca</text>
+  </g>
+</svg>`);
 await sharp(artwork).composite([
   { input: blurredGlow, left: center.x - logoSize / 2 - 60, top: center.y - logoSize / 2 - 60 },
   { input: logo, left: center.x - logoSize / 2, top: center.y - logoSize / 2 },
   { input: window, left: editor.x, top: editor.y },
+  { input: title, left: center.x - 200, top: 544 },
 ]).png().toFile(output);
-console.log('Created ' + output + ' with a crop-safe mark and real Countries editor.');
+console.log('Created ' + output + ' with a large Countries editor on the left, GraphQL logo on the right, and glowing title.');
