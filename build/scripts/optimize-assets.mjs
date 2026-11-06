@@ -99,8 +99,20 @@ for (const path of files('editor').filter(path => path.endsWith('.css'))) {
     if (text.includes(oldName)) writeFileSync(reference, text.replaceAll(oldName, newName));
   }
 }
+// Marketing screenshots: lossy palette quantization (catalog display only, not runtime).
+for (const path of files('images').filter(path => path.endsWith('.png') && basename(path) !== 'icon.png')) {
+  const before = readFileSync(path);
+  const lossless = await sharp(before).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
+  const lossy = await sharp(before).png({ quality: 80, colours: 256, dither: 1.0, compressionLevel: 9 }).toBuffer();
+  const after = lossy.length <= lossless.length ? lossy : lossless;
+  if (after.length >= before.length) continue;
+  writeFileSync(path, after);
+  imageBytesSaved += before.length - after.length;
+}
+// Runtime icon and original captures: lossless with pixel-perfect verification.
 for (const folder of ['images', 'build/assets/captures']) {
-  for (const path of files(folder).filter(path => path.endsWith('.png'))) {
+  const pngs = files(folder).filter(path => path.endsWith('.png') && (folder !== 'images' || basename(path) === 'icon.png'));
+  for (const path of pngs) {
     const before = readFileSync(path);
     const after = await sharp(before).png({ compressionLevel: 9, adaptiveFiltering: true }).toBuffer();
     if (after.length >= before.length) continue;

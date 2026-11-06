@@ -79,3 +79,23 @@ All generated editor, HTTP worker, sidebar, and preview assets are byte-identica
 Vite provides GraphiQL's supported worker integration, and TypeScript provides source checks. The build generates a single editor for Orca's isolated frame, with locally bundled module workers and assets.
 
 Generated assets are marked with GitHub Linguist attributes, and Monaco adaptations fail the build if required patterns disappear. Dependencies, generated provenance, local host metadata, and ZIPs remain excluded from uploads. Existing screenshots and their original captures are preserved. Neither layout changes nor the measured notice saving guarantee clearance of the unpublished catalog `code`/`size` review categories.
+
+## Stub unused modules and trim notices: 0.1.6
+
+| Component | 0.1.5 | 0.1.6 |
+| --- | ---: | ---: |
+| Editor directory | 6.80 MB | 6.47 MB |
+| Largest editor JavaScript chunk | 0.82 MB | 0.82 MB |
+| Third-party notice collection | 0.66 MB | 0.10 MB |
+| Entire runtime folder | 9.07 MB | 7.60 MB |
+| Release ZIP | 3.07 MB | 2.38 MB |
+
+The runtime folder is 7,601,977 bytes, saving 1,467,119 bytes (16.2%) over the published 0.1.5 tag. The release ZIP is 2,376,563 bytes (22.7% smaller). Exact final measurements are in `dist/artifact.json`.
+
+- Stub the unused Monaco diff editor widget and multi-diff editor widget via a Vite `resolveId` plugin. The standalone API statically imports both to define `StandaloneDiffEditor2` and surface `MultiDiffEditorWidget`, but neither is called by this plugin or `@graphiql/react`. The `monaco-diff` chunk (174,578 bytes) is eliminated entirely. The stub exports empty classes with the same shape; the `manualChunks` entry for `monaco-diff` stays as a no-op safety net. If a future version needs diff, the build fails visibly.
+- Stub framer-motion with a lightweight React module that renders `Reorder.Item` as `<li>` and `Reorder.Group` as `<ul>` without animation or drag. `@graphiql/react` uses framer-motion exclusively for tab drag-to-reorder. Tabs still render, select, and close through the close button; only drag reordering is lost. The `motion` chunk (141,834 bytes) and the framer-motion/motion-dom/motion-utils packages are eliminated, reducing the bundled package count from 84 to 81.
+- Exclude upstream third-party aggregation files (prettier's `THIRD-PARTY-NOTICES.md` and Monaco's `ThirdPartyNotices.txt`) from the notice collection. These list *their* upstream build-time dependencies, not ours. Each package's primary MIT LICENSE remains verbatim. This saves 425,597 bytes from the notice file.
+- Cap development-tool notice texts at 5 KB with a pointer to the npm registry. Dev tools (vite, vitest, sharp, typescript) are installed by npm for development and not redistributed; their primary license grants remain. This saves a further 135 KB.
+- Apply lossy palette quantization (256 colours, quality 80) to marketing screenshots. The runtime icon and original captures keep lossless pixel-verified compression.
+
+The official GraphiQL application, transport, Monaco features, and all editor functionality are unchanged. TypeScript, 50 native/source tests, 46 compiled-worker tests, and manifest/static checks pass. Stubbed modules have no runtime callers and fail the build visibly if a future dependency reaches them.

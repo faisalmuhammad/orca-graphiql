@@ -4,8 +4,13 @@ import { BUILD, PLUGIN } from './paths.mjs';
 import { readInputs } from './provenance.mjs';
 
 const root = JSON.parse(readFileSync(join(BUILD, 'package.json'), 'utf8'));
+const DEV_TOOL_CAP = 5 * 1024;
 const seen = new Set(), entries = [], documents = new Map();
-function documentReference(text, owner) {
+function documentReference(text, owner, tool = false) {
+  if (tool && Buffer.byteLength(text) > DEV_TOOL_CAP) {
+    const name = owner.replace(/@.*$/, '');
+    text = text.slice(0, DEV_TOOL_CAP) + '\n\n[Truncated — full text at https://www.npmjs.com/package/' + name + ']\n';
+  }
   let document = documents.get(text);
   if (!document) {
     document = { id: 'NOTICE-' + String(documents.size + 1).padStart(3, '0'), text, owners: new Set() };
@@ -22,9 +27,9 @@ function record(dir, scope, tool = false) {
   const refs = new Set();
   const files = readdirSync(dir).sort().filter(file => tool
     ? /^(licen[cs]e|copying)([.-]|$)/i.test(file)
-    : /^(licen[cs]e|copying|notice)([.-]|$)|third.?party.?notices/i.test(file));
+    : /^(licen[cs]e|copying|notice)([.-]|$)/i.test(file) && !/third.?party.?notices/i.test(file));
   for (const file of files) {
-    try { refs.add(documentReference(readFileSync(join(dir, file), 'utf8'), key)); }
+    try { refs.add(documentReference(readFileSync(join(dir, file), 'utf8'), key, tool)); }
     catch (error) { if (error.code !== 'EISDIR') throw error; }
   }
   if (!refs.size) {
@@ -57,7 +62,7 @@ for (const [name, file] of [['Fira Code font', 'LICENSE-FIRA-CODE'], ['Roboto fo
 }
 const notices = [
   'Third-party notices for GraphiQL for Orca',
-  'Runtime package inventory comes from emitted editor, worker, and sidebar modules. Complete original runtime license/notice documents, direct development-tool primary licenses, and screenshot font notices follow.',
+  'Runtime package inventory comes from emitted editor, worker, and sidebar modules. Complete original runtime license/notice documents (excluding upstream third-party aggregations), direct development-tool primary licenses, and screenshot font notices follow.',
   'Every included package is credited below. Byte-identical legal documents appear once with references; distinct original copyright and license text is preserved verbatim.',
   '', 'PACKAGE INDEX', ...entries, '', 'ORIGINAL LICENSE DOCUMENTS',
 ];

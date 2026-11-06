@@ -31,15 +31,17 @@ orca plugin check .. --json
 
 The official GraphiQL React application is retained. The wrapper uses `orca.document.session()` for conflict-aware document synchronization, `orca.plugin.request()` for bounded requests, and the trusted worker for networking and secrets. Opening a session never approves or executes a request.
 
-Monaco's public feature registrations retain schema suggestions, snippets, diagnostics, hover, formatting, find, navigation, folding, and accessibility. Optional extras such as CodeLens, color pickers, inlay hints, and sticky scroll are omitted. A guarded transform removes the corresponding optional side-effect imports from Monaco's worker helper; its core controllers, worker factory, synchronization, and Trusted Types logic remain intact. An upstream helper change fails the build.
+Monaco's public feature registrations retain schema suggestions, snippets, diagnostics, hover, formatting, find, navigation, folding, and accessibility. Optional extras such as CodeLens, color pickers, inlay hints, and sticky scroll are omitted. A guarded transform removes the corresponding optional side-effect imports from Monaco's worker helper; its core controllers, worker factory, synchronization, and Trusted Types logic remain intact. An upstream helper change fails the build. The unused diff editor widget and multi-diff editor widget are stubbed via a `resolveId` plugin, eliminating the `monaco-diff` chunk entirely; neither is called by this plugin or upstream dependencies.
+
+framer-motion is stubbed with a lightweight React module that renders `Reorder.Item`/`Reorder.Group` as plain `<li>`/`<ul>` elements without animation or drag. This is used exclusively by `@graphiql/react`'s tab component for drag-to-reorder, which is not a core feature.
 
 Vite keeps upstream lazy imports and produces smaller local vendor chunks. The three module workers are built together with shared infrastructure; the build updates constructor URLs and removes obsolete standalone outputs. Small chunks alone do not reduce total bytes.
 
-UI/editor text uses system fonts. The complete Codicon font is compressed to inline WOFF2 because the public indexer rejects standalone binary fonts. Compression is verified by comparing decompressed font tables. PNG compression is accepted only when decoded pixels match; the approved previews and original captures are preserved.
+UI/editor text uses system fonts. The complete Codicon font is compressed to inline WOFF2 because the public indexer rejects standalone binary fonts. Compression is verified by comparing decompressed font tables. Marketing screenshots use lossy palette quantization; the runtime icon and original captures keep lossless pixel-verified compression.
 
 ## Notices and credits
 
-Vite/Rollup and esbuild record packages contributing emitted code or styles. `npm run notices` requires those inventories, so run `npm run build` first. Complete original runtime license/notice documents remain verbatim, with byte-identical documents shared through a package index. Direct development tools retain credits and their primary license texts; their executables and transitive dependencies are installed by npm rather than distributed with the plugin. Screenshot font notices remain included. See [credits and provenance](../THIRD_PARTY_NOTICES.md).
+Vite/Rollup and esbuild record packages contributing emitted code or styles. `npm run notices` requires those inventories, so run `npm run build` first. Complete original runtime license/notice documents remain verbatim (excluding upstream third-party aggregation files such as prettier's and Monaco's own downstream notices), with byte-identical documents shared through a package index. Direct development tools retain credits and their primary license texts, capped at 5 KB with a pointer to the npm registry; their executables and transitive dependencies are installed by npm rather than distributed with the plugin. Screenshot font notices remain included. See [credits and provenance](../THIRD_PARTY_NOTICES.md).
 
 ## Runtime checks and packaging
 

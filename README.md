@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.5
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.6
    ```
 
-   Keep `#v0.1.5` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.6` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -149,7 +149,7 @@ An unofficial integration of [GraphiQL](https://github.com/graphql/graphiql), ma
 | GraphiQL, toolkit, React integration, Collections | MIT | [LICENSE-GRAPHIQL](LICENSE-GRAPHIQL) |
 | GraphQL.js | MIT | [LICENSE-GRAPHQL](LICENSE-GRAPHQL) |
 | React and React DOM | MIT | [Third-party notices](THIRD_PARTY_NOTICES.txt) |
-| Monaco Editor | MIT and upstream third-party notices | [LICENSE-MONACO](LICENSE-MONACO) |
+| Monaco Editor | MIT | [LICENSE-MONACO](LICENSE-MONACO) |
 | Fira Code (original screenshots) | SIL OFL 1.1 | [LICENSE-FIRA-CODE](LICENSE-FIRA-CODE) |
 | Roboto (original screenshots) | Apache 2.0 | [LICENSE-ROBOTO](LICENSE-ROBOTO) |
 
