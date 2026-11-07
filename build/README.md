@@ -51,7 +51,7 @@ With the repository root loaded as an approved development plugin, `npm run runt
 
 `npm run package` produces a runtime-only ZIP, size measurements, and checksums under `../dist/`. It includes root runtime assets, templates, previews, documentation, and licenses, without build sources, original captures, dependencies, or caches. Git installs use tagged files directly and do not require this ZIP.
 
-From the repository root, stage uploaded additions and removals with `git add .`, then run `npm --prefix build run release:check`. The checker enforces Orca's 2,000-file / 50 MiB folder limits, 10 MiB entry limit, and 1 MiB transpilation limit, plus a stricter project budget of 1 MiB per editor JavaScript chunk. It rejects non-image binaries, symlinks, and missing tracked files.
+From the repository root, stage uploaded additions and removals with `git add .`, then run `npm --prefix build run release:check`. The checker enforces Orca's 2,000-file / 50 MiB folder limits, 10 MiB entry limit, and 1 MiB transpilation limit, plus a stricter project budget of 1 MiB per editor JavaScript chunk. It rejects non-image binaries, symlinks, missing tracked files, and the known broken tab adapter from 0.1.6/0.1.7, even if an unused copy remains in `editor/assets/`. Replace the compiled editor folder as well as the source when publishing the fix.
 
 Exclude `node_modules/` at every depth, `.orca/`, `.cache/`, `dist/`, logs, and OS metadata from uploads. Add the plugin root—not `build/`—in Orca's Development folders settings.
 

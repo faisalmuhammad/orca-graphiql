@@ -98,8 +98,10 @@ The runtime folder is 7,601,977 bytes, saving 1,467,119 bytes (16.2%) over the p
 - Cap development-tool notice texts at 5 KB with a pointer to the npm registry. Dev tools (vite, vitest, sharp, typescript) are installed by npm for development and not redistributed; their primary license grants remain. This saves a further 135 KB.
 - Apply lossy palette quantization (256 colours, quality 80) to marketing screenshots. The runtime icon and original captures keep lossless pixel-verified compression.
 
-## Tab-rendering fix: 0.1.7
+## Tab-rendering fix: 0.1.8
 
 GraphiQL's transport, autocomplete, validation, formatting, and documentation remain available; tab drag reordering is omitted as described above. The tab adapter renders at runtime and uses an explicitly imported React `createElement` function. This corrects a JSX compilation regression in 0.1.6 that left an undefined `React` reference in the bundle and caused a blank editor. Existing preview images, worker, sidebar, and templates are unchanged. The largest JavaScript chunk remains 817,712 bytes; exact package measurements are recorded in `dist/artifact.json`.
 
 TypeScript, 51 native/source tests, 47 compiled-worker tests (four native document tests skipped), and manifest/static checks pass. The corrected built-editor Chrome check passes execution, autocomplete, GraphQL/JSON diagnostics, formatting, Variables/Headers, themes, and local asset loading with no browser errors or external asset requests. The editor also renders in an actual Orca tab without frame errors; query execution for this corrected build was checked in the browser fixture.
+
+The public v0.1.7 release retained the broken compiled editor even though its source adapter was corrected. Version 0.1.8 packages the tested local assets and adds a release guard for that known broken bundle. This release does not change runtime features or preview images.

@@ -47,7 +47,17 @@ for (const path of files) {
     if (!valid) issues.push(path + ': invalid image');
     continue;
   }
-  try { decoder.decode(data); if (data.includes(0)) throw new Error('binary'); }
+  try {
+    const source = decoder.decode(data);
+    if (data.includes(0)) throw new Error('binary');
+    // Reject the known stale tab adapter even when old assets are left unused.
+    // Its classic JSX output calls React without an imported binding.
+    if (/^editor[\\/]assets[\\/].*[.]js$/.test(path)
+      && source.includes('Reorder.Item') && source.includes('Reorder.Group')
+      && /return\s+React[.]createElement\(["'](?:li|ul)["']/.test(source)) {
+      issues.push(path + ': contains the broken tab adapter (React is not defined); rebuild and replace editor/, removing obsolete assets');
+    }
+  }
   catch { issues.push(path + ': non-image binary file'); }
 }
 if (files.size > 2000) issues.push('Plugin source folder exceeds the Orca 2,000-file limit');
