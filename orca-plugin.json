@@ -4,7 +4,7 @@
   "publisher": "faisalmuhammad",
   "id": "graphiql",
   "name": "GraphiQL for Orca",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A GraphiQL integration for Orca with saved sessions, named environments, schema exploration, and secure authentication.",
   "engines": {
     "orca": ">=1.4.248"

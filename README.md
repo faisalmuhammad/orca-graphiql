@@ -16,10 +16,10 @@ Requires **Orca desktop 1.4.248 or newer**.
 2. Choose **Add plugin → From a Git URL…** and enter:
 
    ```text
-   https://github.com/faisalmuhammad/orca-graphiql#v0.1.6
+   https://github.com/faisalmuhammad/orca-graphiql#v0.1.7
    ```
 
-   Keep `#v0.1.6` at the end. Orca requires a release tag or commit hash to install from Git.
+   Keep `#v0.1.7` at the end. Orca requires a release tag or commit hash to install from Git.
 3. Review and approve the requested access: a trusted worker with your user account's host access, plugin-owned storage/secrets, and workspace access for session management.
 4. Choose **New GraphiQL Session** from Orca's new-file menu, or **New** in **GraphiQL Explorer**, to open a session in the central editor.
 
@@ -100,6 +100,7 @@ Mark an environment **Production** to require mutation confirmation. This identi
 
 | Symptom | What to check |
 | --- | --- |
+| Blank editor with `React is not defined` on 0.1.6 | Update to 0.1.7 and reopen the session. The tab-rendering import is fixed. |
 | Disconnected after opening, switching, or reloading | Choose Connect / Test. Approval is temporary and expires after inactivity. |
 | Authentication failed | Check auth type, header name, credential, and exact endpoint binding. |
 | Schema unavailable | Introspection may be disabled. A reachable endpoint can execute without autocomplete. |
@@ -134,7 +135,7 @@ orca plugin check . --json
 
 Add the repository root through **Settings → Plugins → Development folders…**. Release tags must include compiled `editor/`, `worker/`, and `activity/`; Orca loads them directly. Exclude `node_modules/`, `.orca/`, `build/.cache/`, and `dist/` from uploads and Git.
 
-When uploading this restructure manually, upload `build/` without its dependencies/cache and remove the previous root source/tooling paths. The compiled runtime assets and images match v0.1.4, so those folders can stay as they are. For later builds that change editor assets, replace the entire `editor/` folder to remove obsolete hashes. Stage additions and removals with `git add .`, then run `npm --prefix build run release:check` before tagging.
+For manual source uploads, include `build/` without its dependencies/cache and include the compiled runtime folders. When a build changes editor assets, replace the entire `editor/` folder to remove obsolete hashes. Release 0.1.7 includes rebuilt editor assets for the tab-rendering fix; existing previews, worker, sidebar, and templates can stay as they are. Remove the old `build/src/editor/stubs/framer-motion.jsx` adapter, which is replaced by `framer-motion.js`. Stage additions and removals with `git add .`, then run `npm --prefix build run release:check` before tagging.
 
 See [build instructions, compatibility adaptations, and test commands](build/README.md) and [bundle measurements](BUNDLE_SIZE.md).
 

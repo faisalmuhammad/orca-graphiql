@@ -5,7 +5,7 @@ const monacoFeatures = fileURLToPath(new URL('./src/editor/monaco-features.ts', 
 const optionalMonacoFeatures = /\/(?:anchorSelect|codelens|colorPicker|diffEditorBreadcrumbs|floatingMenu|gpu|inlayHints|inlineProgress|inPlaceReplace|linkedEditing|longLinesHelper|middleScroll|sectionHeaders|semanticTokens|stickyScroll|iPadShowKeyboard|inspectTokens)\/|\/(?:diffEditor[.]contribution|inlineCompletions[.]contribution|dropIntoEditorContribution)[.]js$/;
 const diffEditorStub = fileURLToPath(new URL('./src/editor/stubs/diff-editor-widget.js', import.meta.url));
 const multiDiffEditorStub = fileURLToPath(new URL('./src/editor/stubs/multi-diff-editor-widget.js', import.meta.url));
-const framerMotionStub = fileURLToPath(new URL('./src/editor/stubs/framer-motion.jsx', import.meta.url));
+const framerMotionStub = fileURLToPath(new URL('./src/editor/stubs/framer-motion.js', import.meta.url));
 function stubUnusedModules(): Plugin {
   return {
     name: 'graphiql-stub-unused-modules',
